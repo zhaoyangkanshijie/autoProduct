@@ -217,10 +217,10 @@
 		//插入tr td
 		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).append(
 			'<tr>' 
-			+ '<td width="' + sideWidthSubmit + 'px">&nbsp;</td>'
-			+ '<td width="' + middleWidthSubmit + 'px" align="center" valign="top">'
+			+ '<td width="' + sideWidthSubmit + '">&nbsp;</td>'
+			+ '<td width="' + middleWidthSubmit + '" align="center" valign="top">'
 			+ '</td>'
-			+ '<td width="' + sideWidthSubmit + 'px">&nbsp;</td>'
+			+ '<td width="' + sideWidthSubmit + '">&nbsp;</td>'
 			+ '</tr>'
 		);
 	}
@@ -231,7 +231,7 @@
 		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).append(
 			'<tr>' 
 			+ '<td width="auto">&nbsp;</td>'
-			+ '<td width="' + middleWidthSubmit + 'px" align="center" valign="top">'
+			+ '<td width="' + middleWidthSubmit + '" align="center" valign="top">'
 			+ '</td>'
 			+ '<td width="auto">&nbsp;</td>'
 			+ '</tr>'
@@ -339,7 +339,7 @@
 				console.log("index:"+index);
 				console.log("add <h3>");
 				$("table").eq(index).find("td").eq(1).append(
-					'<h3 style="font-size:30px;line-height: 40px;font-weight:normal;color:#ff0000;z-index:9;" class="h3draggable">'
+					'<h3 style="font-size:30px;line-height: 40px;font-weight:100;color:#ff0000;z-index:9;" class="h3draggable">'
 						+ 'h3h3h3h3h3'
 					+ '</h3>'
 				);
