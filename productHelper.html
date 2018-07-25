@@ -28,6 +28,8 @@
 	var pDefaultFontWeight = "normal";//p默认字体粗细
 	var pDefaultColor = "#0000ff";//p默认字体颜色
 	
+	var globalColor = new Array();//用于记录颜色
+	
 	var addNumber = 0;//table数量
 	var vhrNumber = 0;//垂直参考线数量
 	
@@ -301,6 +303,7 @@
 					+ '<div class="add-hr-horizontal">'
 						+ '<button class="add-hhr">table添加水平参考线</button>'
 					+ '</div>'
+					+ '<textarea class="global-color" style="margin: 0px;height: 60px;width: 285px;"></textarea>'
 				+ '</div>'
 			+ '</div>'
 		);
@@ -644,6 +647,10 @@
 			if(reg.test(value))
 			{
 				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("color","#"+value);
+				if($.inArray(value,globalColor) < 0){
+					globalColor.push(value);
+					initialGlobalColor();
+				}
 			}
 			else
 			{
@@ -679,6 +686,10 @@
 			if(reg.test(value))
 			{
 				$("table").eq(ptableNumber).find("p").eq(pNumber).css("color","#"+value);
+				if ($.inArray(value, globalColor) < 0) {
+					globalColor.push(value);
+					initialGlobalColor();
+				}
 			}
 			else
 			{
@@ -1166,6 +1177,16 @@
 			hhrControllerEvent(hhrTableNumber,hhrLength,buttonThis);
 		});
 	}
+
+	//显示全局颜色到textarea
+	var initialGlobalColor = function(){
+		var colorStr = "";
+		for(var i = 0;i < globalColor.length;i++){
+			colorStr += globalColor[i];
+			colorStr += "/";
+		}
+		$(".global-color").val(colorStr);
+	}
 	
 	//注册控制器监听事件
 	var addControllerEvent = function()
@@ -1179,6 +1200,7 @@
 		removeH3P();
 		removeTable();
 		addHhr();
+		initialGlobalColor();
 	}
 	
 	//添加控制器
