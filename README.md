@@ -15,12 +15,16 @@ div
 
 table1
 
+tbody
+
 tr
 
 td td td
 
 
 table2
+
+tbody
 
 tr
 
@@ -158,3 +162,10 @@ td td td
 * 阶段四
 	1. “end”点击，清除文字拖动事件
 	2. 清除各输入、帮助模块、js、css、事件、class、id
+
+## 待开发
+1. 轮播：swiper.js
+2. Photoshop jsx脚本编程，导出文字、位置到txt
+3. js用户触发式操作本地文件，读取txt，ActiveXObject
+4. 上传图片->后台
+5. 优化总宽度为1200界面
