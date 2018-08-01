@@ -962,6 +962,16 @@
 						"top":h3TopOldNum+"px"
 					});
 				}
+				var h3MarginTop = parseInt($(this).css("margin-top"));
+				var h3MarginLeft = parseInt($(this).css("margin-left"));
+				$(".helper").eq(h3tableNum).find(".h3-font-size-spinner").val(parseInt($(this).css("font-size")));
+				$(".helper").eq(h3tableNum).find(".h3-line-height-spinner").val(parseInt($(this).css("line-height")));
+				if(!isNaN(h3MarginTop)){
+					$(".helper").eq(h3tableNum).find(".h3-margin-top").val(h3MarginTop);
+				}
+				if(!isNaN(h3MarginLeft)){
+					$(".helper").eq(h3tableNum).find(".h3-margin-left").val(h3MarginLeft);
+				}
 			}
 		});
 	}
@@ -1015,6 +1025,16 @@
 						"left":pLeftOldNum+"px",
 						"top":pTopOldNum+"px"
 					});
+				}
+				var pMarginTop = parseInt($(this).css("margin-top"));
+				var pMarginLeft = parseInt($(this).css("margin-left"));
+				$(".helper").eq(ptableNum).find(".p-font-size-spinner").val(parseInt($(this).css("font-size")));
+				$(".helper").eq(ptableNum).find(".p-line-height-spinner").val(parseInt($(this).css("line-height")));
+				if(!isNaN(pMarginTop)){
+					$(".helper").eq(ptableNum).find(".p-margin-top").val(pMarginTop);
+				}
+				if(!isNaN(pMarginLeft)){
+					$(".helper").eq(ptableNum).find(".p-margin-left").val(pMarginLeft);
 				}
 			}
 		});
