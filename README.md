@@ -9,6 +9,10 @@
 5. 点击结束，生成专题，Chrome检查，复制html下代码
 6. 把代码放到如Dreamweaver等工具，进行格式化
 
+## 最新说明
+
+version4用于引入思源黑体，无需思源的，可用version3的微软雅黑。version4需要把SourceHanSansCN-Medium.ttf放在与productHelper.html同级目录，完成所有步骤后，结合[font-spider](http://font-spider.org/index.html)，可优化ttf大小。
+
 ## 界面
 
 div

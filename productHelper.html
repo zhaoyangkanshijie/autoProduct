@@ -152,12 +152,27 @@
 		$("#append-new").before(
 			'<div id="' + productNameSubmit + '-main">' + '</div>'
 		);
+		$("#" + productNameSubmit + "-main").append(
+			`<style>
+				@font-face {
+				font-family: 'SourceHanSansCN-Medium';
+				src: url('./SourceHanSansCN-Medium.eot');
+				src:
+					url('./SourceHanSansCN-Medium.eot?#font-spider') format('embedded-opentype'),
+					url('./SourceHanSansCN-Medium.woff') format('woff'),
+					url('./SourceHanSansCN-Medium.ttf') format('truetype'),
+					url('./SourceHanSansCN-Medium.svg') format('svg');
+				font-weight: normal;
+				font-style: normal;
+				}
+			</style>`
+		);
 		if(optionValSubmit == 0)
 		{
 			var w = middleWidthSubmit + 2 * sideWidthSubmit;
 			$("#" + productNameSubmit + "-main").css({
 				"width": w+"px",
-				"font":"16px/26px 'Microsoft YaHei'",
+				"font-family":"SourceHanSansCN-Medium",
 				"overflow":"hidden"
 			});
 		}
@@ -165,7 +180,7 @@
 		{
 			$("#" + productNameSubmit + "-main").css({
 				"width": "100%",
-				"font":"16px/26px 'Microsoft YaHei'",
+				"font-family":"SourceHanSansCN-Medium",
 				"min-width":middleWidthSubmit+"px",
 				"overflow":"hidden"
 			});
@@ -279,7 +294,7 @@
 	//table后添加控制界面
 	var addControllerFace = function(){
 		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).after(
-			'<div class="helper" style="position:relative;top:-500px;width:300px;">'
+			'<div class="helper" style="position:relative;top:-500px;width:300px;font-family:Microsoft YaHei">'
 				+ '<button class="show-hidden-ctrl" onclick="$(this).parent().find(\'div\').slideToggle(\'slow\')">显示/隐藏控件</button>'
 				+ '<div class="table-helper">'
 					+ '<button class="hints-dark" style="margin-right: 9px;" onclick="$(this).parent().css(\'color\',\'#000000\')">提示文字变深色</button>'
@@ -1605,7 +1620,7 @@
     <div id="append-new">
 		<button class="add">add</button>
 	</div>
-    
+
     <div id="add-hr-vertical">
     	<button class="add-vhr">添加垂直参考线</button>
     </div>
