@@ -13,6 +13,8 @@
 
 version4用于引入思源黑体，无需思源的，可用version3的微软雅黑。version4需要把SourceHanSansCN-Medium.ttf放在与productHelper.html同级目录，完成所有步骤后，结合[font-spider](http://font-spider.org/index.html)，可优化ttf大小。
 
+version5为特殊版本，把version4的字体文件放到images文件夹里，另外为兼容老版富文本编辑器bug，换行替换为```<font style="font-family: Microsoft YaHei"><br /></font>```。
+
 ## 界面
 
 div
