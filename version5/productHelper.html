@@ -756,7 +756,7 @@
 	//输入h3内容
 	var h3Textarea = function(h3tableNumber,h3Number){
 		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-textarea").bind('input propertychange',function(){
-			var value = $(this).val().replace(/\n/g,'<font style="font-family: Microsoft YaHei"><br /></font>').replace(/\s/g,"&nbsp;");
+			var value = $(this).val().replace(/ /g,"&nbsp;").replace(/\n/g,'<font style="font-family: Microsoft YaHei"><br /></font>');
 			console.log("textarea:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
 			$("table").eq(h3tableNumber).find("h3").eq(h3Number).html(value);
 			if(value.length == 0)
@@ -769,7 +769,7 @@
 	//输入p内容
 	var pTextarea = function(ptableNumber,pNumber){
 		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-textarea").bind('input propertychange',function(){
-			var value = $(this).val().replace(/\n/g,'<font style="font-family: Microsoft YaHei"><br /></font>').replace(/\s/g,"&nbsp;");
+			var value = $(this).val().replace(/ /g,"&nbsp;").replace(/\n/g,'<font style="font-family: Microsoft YaHei"><br /></font>');
 			console.log("textarea:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
 			$("table").eq(ptableNumber).find("p").eq(pNumber).html(value);
 			if(value.length == 0)
