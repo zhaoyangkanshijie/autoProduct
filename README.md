@@ -17,26 +17,20 @@ version5为特殊版本，把version4的字体文件放到images文件夹里，�
 
 ## 界面
 
-div
+1. 随意修改文字大小行高，且随意拖动，修改样式和布局方便
+![专题神器图例1](./readmeImage/autoProduct1.png)
 
-table1
+2. 文字多种颜色可选，且支持自定义设置颜色
+![专题神器图例2](./readmeImage/autoProduct2.png)
 
-tbody
+3. 创建板块方便，展开控件即可编辑
+![专题神器图例3](./readmeImage/autoProduct3.png)
 
-tr
+4. 结束编辑，完成制作
+![专题神器图例4](./readmeImage/autoProduct4.png)
 
-td td td
-
-
-table2
-
-tbody
-
-tr
-
-td td td
-
-...
+5. 代码优雅简洁，易抽取，易嵌套，易修改
+![专题神器图例5](./readmeImage/autoProduct5.png)
 
 ### 起始界面
 * 初始选项
