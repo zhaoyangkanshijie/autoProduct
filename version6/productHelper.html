@@ -1,0 +1,1664 @@
+﻿<!DOCTYPE html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>专题制作插件</title>
+<link rel="stylesheet" href="./js/jquery-ui.min.css">
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/jquery-ui.min.js"></script>
+<script src="./js/jquery.colorpicker.js"></script>
+<script src="./js/jquery.mousewheel.js"></script>
+
+</head>
+
+<script>
+	var productNameSubmit = "";//确认的产品型号
+	var optionValSubmit = -1;//确认的option选项值，-1没选，0为no，1为yes
+	var middleWidthSubmit = 0;//确认的中间td宽度
+	var sideWidthSubmit = 0;//确认的两边td宽度
+	var tableWidthSubmit = 0;//确认的table宽度
+	var fontFamilySubmit = "";//确认的字体
+	var alreadyCommit = 0;//确认选项
+	
+	var h3DefaultFontSize = "30px";//h3默认字体大小
+	var h3DefaultLineHeight = "30px";//h3默认行高
+	var h3DefaultFontWeight = "normal";//h3默认字体粗细
+	var h3DefaultColor = "#ff0000";//h3默认字体颜色
+	var pDefaultFontSize = "16px";//p默认字体大小
+	var pDefaultLineHeight = "26px";//p默认行高
+	var pDefaultFontWeight = "normal";//p默认字体粗细
+	var pDefaultColor = "#0000ff";//p默认字体颜色
+	
+	var globalColor = new Array();//用于记录颜色
+	
+	var addNumber = 0;//table数量
+	var vhrNumber = 0;//垂直参考线数量
+	
+	//初始化提交值
+	var init = function(){
+		console.log("initial");
+		productNameSubmit = "";
+		optionValSubmit = -1;
+		middleWidthSubmit = 0;
+		sideWidthSubmit = 0;
+		tableWidthSubmit = 0;
+		fontFamilySubmit = "";
+		alreadyCommit = 0;
+	}
+	
+	//提交参数
+	var submitValue = function(productName,optionVal,middleWidth,sideWidth,tableWidth,fontFamily){
+		if(optionVal == 1)
+		{
+			console.log("MF submit");
+		}
+		else
+		{
+			console.log("TL submit");
+		}
+		$(document).attr("title",productName);
+		productNameSubmit = productName;
+		optionValSubmit = optionVal;
+		middleWidthSubmit = middleWidth;
+		sideWidthSubmit = sideWidth;
+		tableWidthSubmit = tableWidth;
+		fontFamilySubmit = fontFamily;
+		alreadyCommit = 1;
+	}
+	
+	//MF版面处理
+	var modifyMFTable = function(){
+		console.log("modifyMFTable");
+		if(addNumber > 0)
+		{
+			//div处理
+			$("div").eq(2).attr("id",productNameSubmit + "-main");
+			$("#" + productNameSubmit + "-main").css({
+				"width": "100%",
+				"min-width":middleWidthSubmit+"px"
+			});
+			//table处理
+			$("#" + productNameSubmit + "-main").find("table").css({
+				"width":"100%",
+				"min-width":middleWidthSubmit+"px"
+			});
+			//td处理
+			var td1 = $("#" + productNameSubmit + "-main").find("table").find("tr").find("td");
+			td1.eq(0).attr("width","auto");
+			td1.eq(2).attr("width","auto");
+		}
+	}
+	
+	//TL版面处理
+	var modifyTLTable = function(){
+		console.log("modifyTLTable");
+		if(addNumber > 0)
+		{
+			//div处理
+			var w3 = middleWidthSubmit + 2 * sideWidthSubmit;
+			$("div").eq(2).attr("id",productNameSubmit + "-main");
+			$("#" + productNameSubmit + "-main").css({
+				"width": w3+"px",
+				"min-width":""
+			});
+			//table处理
+			$("#" + productNameSubmit + "-main").find("table").css({
+				"width":w3+"px",
+				"min-width":""
+			});
+			//td处理
+			var td2 = $("#" + productNameSubmit + "-main").find("table").find("tr").find("td");
+			td2.eq(0).attr("width",sideWidthSubmit+"px");
+			td2.eq(2).attr("width",sideWidthSubmit+"px");
+		}
+	}
+	
+	//校验数据
+	var validateData = function(productName,optionVal,middleWidth,sideWidth,tableWidth,fontFamily){
+		console.log("validate");
+		if(productName == "")
+		{
+			alert("产品型号(英文)");
+			return false;
+		}
+		if(optionVal != "yes" && optionVal != "no")
+		{
+			alert("选择td是否使用auto");
+			return false;
+		}
+		if(isNaN(middleWidth) || middleWidth < 500)
+		{
+			alert("中间td的宽度(px)");
+			return false;
+		}
+		if(optionVal == "yes")
+		{
+			if(isNaN(tableWidth) || tableWidth < 500)
+			{
+				alert("table宽度(px)");
+				return false;
+			}
+		}
+		if(optionVal == "no")
+		{
+			if(isNaN(sideWidth) || sideWidth < 50)
+			{
+				alert("不使用auto时两边td宽度(px)");
+				return false;
+			}
+		}
+		if(fontFamily == "选择字体")
+		{
+			alert("选择字体");
+			return false;
+		}
+		return true;
+	}
+	
+	//添加div
+	var addDiv = function(){
+		$("#append-new").before(
+			'<div id="' + productNameSubmit + '-main">' + '</div>'
+		);
+		$("#" + productNameSubmit + "-main").append(
+			`<style>
+				@font-face {
+					font-family: 'SourceHanSansCN-`+fontFamilySubmit+`';
+					src: url('images/SourceHanSansCN-`+fontFamilySubmit+`.eot');
+					src:
+						url('images/SourceHanSansCN-`+fontFamilySubmit+`.eot?#font-spider') format('embedded-opentype'),
+						url('images/SourceHanSansCN-`+fontFamilySubmit+`.woff') format('woff'),
+						url('images/SourceHanSansCN-`+fontFamilySubmit+`.ttf') format('truetype'),
+						url('images/SourceHanSansCN-`+fontFamilySubmit+`.svg') format('svg');
+					font-weight: normal;
+					font-style: normal;
+				}
+			</style>`
+		);
+		if(optionValSubmit == 0)
+		{
+			var w = middleWidthSubmit + 2 * sideWidthSubmit;
+			$("#" + productNameSubmit + "-main").css({
+				"width": w+"px",
+				"font-family":"'SourceHanSansCN-"+fontFamilySubmit+"','Microsoft YaHei','Arial'",
+				"overflow":"hidden"
+			});
+		}
+		else
+		{
+			$("#" + productNameSubmit + "-main").css({
+				"width": "100%",
+				"font-family":"'SourceHanSansCN-"+fontFamilySubmit+"','Microsoft YaHei','Arial'",
+				"min-width":middleWidthSubmit+"px",
+				"overflow":"hidden"
+			});
+		}
+	}
+	
+	//添加table，图片数1-9
+	var addTable19 = function(){
+		$("#" + productNameSubmit + "-main").append(
+			'<table cellpadding="0" cellspacing="0" background="images/'
+			+ productNameSubmit + '_0' + addNumber + '.jpg">'
+			+ '</table>'
+		);
+	}
+	
+	//添加table，图片数10+
+	var addTable10 = function(){
+		$("#" + productNameSubmit + "-main").append(
+			'<table cellpadding="0" cellspacing="0" background="images/'
+			+ productNameSubmit + '_' + addNumber + '.jpg">'
+			+ '</table>'
+		);
+	}
+	
+	//设置TLtable属性
+	var setTLTableCSS = function(){
+		var w2 = middleWidthSubmit + 2 * sideWidthSubmit;
+		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).css({
+			"width":w2+"px",
+			"height":"500px",
+			"background-position":"center 0"
+		});
+	}
+	
+	//设置MFtable属性
+	var setMFTableCSS = function(){
+		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).css({
+			"width":"100%",
+			"min-width":middleWidthSubmit+"px",
+			"height":"500px",
+			"background-position":"center 0"
+		});
+	}
+	
+	//插入table
+	var addTable = function(){
+		//插入table
+		if(addNumber < 10)
+		{
+			addTable19();
+		}
+		else
+		{
+			addTable10();
+		}
+	}
+	
+	//插入TLtrtd
+	var addTLtrtd = function(){
+		//插入tr td
+		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).append(
+			'<tr>' 
+			+ '<td width="' + sideWidthSubmit + '">&nbsp;</td>'
+			+ '<td width="' + middleWidthSubmit + '" align="center" valign="top">'
+			+ '</td>'
+			+ '<td width="' + sideWidthSubmit + '">&nbsp;</td>'
+			+ '</tr>'
+		);
+	}
+	
+	//插入MFtrtd
+	var addMFtrtd = function(){
+		//插入tr td
+		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).append(
+			'<tr>' 
+			+ '<td width="auto">&nbsp;</td>'
+			+ '<td width="' + middleWidthSubmit + '" align="center" valign="top">'
+			+ '</td>'
+			+ '<td width="auto">&nbsp;</td>'
+			+ '</tr>'
+		);
+	}
+	
+	//加入一块内容
+	var addContent = function(){
+		addNumber++;
+		console.log('addNumber:'+addNumber);
+		//第一次插入外层div
+		if(addNumber == 1)
+		{
+			addDiv();
+		}
+		
+		//插入table内容
+		if(optionValSubmit == 0)
+		{
+			//产品为TL
+			addTable();
+			setTLTableCSS();
+			addTLtrtd();
+		}
+		else
+		{
+			//产品为MF
+			addTable();
+			setMFTableCSS();
+			addMFtrtd();
+		}
+	}
+	
+	//table后添加控制界面
+	var addControllerFace = function(){
+		$("#" + productNameSubmit + "-main").find("table").eq(addNumber-1).after(
+			'<div class="helper" style="position:relative;top:-500px;width:300px;font-family:Microsoft YaHei">'
+				+ '<button class="show-hidden-ctrl" onclick="$(this).parent().find(\'div\').slideToggle(\'slow\')">显示/隐藏控件</button>'
+				+ '<div class="table-helper">'
+					+ '<button class="hints-dark" style="margin-right: 9px;" onclick="$(this).parent().css(\'color\',\'#000000\')">提示文字变深色</button>'
+					+ '<button class="hints-light" onclick="$(this).parent().css(\'color\',\'#ffffff\')">提示文字变浅色</button>'
+					+ '<br/>'
+					+ '设置table高度：'
+					+ '<input type="text" name="height" class="table-height" placeholder="table高度"/>'
+					+ '<br/>'
+					+ '设置中间td文字：居中/居左'
+					+ '<select class="set-td-align">'
+						+ '<option value="center">center</option>'
+						+ '<option value="left">left</option>'
+                        + '<option value="right">right</option>'
+            		+ '</select>'
+					+ '<br/>'
+					+ '<button class="addh3" style="margin-right: 66px;">addh3</button>'
+					+ '<button class="addp">addp</button>'
+					+ '<br/>'
+					+ '<button class="remove-h3-p" style="margin-right: 27px;">remove-h3-p</button>'
+            		+ '<button class="remove-table">remove-table</button>'
+					+ '<div class="add-hr-horizontal">'
+						+ '<button class="add-hhr">table添加水平参考线</button>'
+					+ '</div>'
+					+ '<textarea class="global-color" style="margin: 0px;height: 60px;width: 285px;"></textarea>'
+				+ '</div>'
+			+ '</div>'
+		);
+	}
+	
+	//循环产生table的input监听器，更改table高度
+	var changeTableHeight = function(){
+		$(".helper .table-height").each(function(index, element) {
+			$(this).bind('input propertychange',function(){
+				console.log("index:"+index);
+				var value = parseInt($(this).val());
+				console.log("value:"+value);
+				if(isNaN(value))
+				{
+					value = 500;
+				}
+				else if(value < 10 || value > 3000)
+				{
+					value = 500;
+				}
+				$("table").eq(index).css('height',value+'px');
+				$(".helper").eq(index).css('top','-'+value+'px');
+				$("table").eq(index).find("td").eq(1).find("hr").remove();
+				$(".helper").eq(index).find(".hhr-helper").children().unbind().remove();
+				$(".helper").eq(index).find(".hhr-helper").remove();
+			});
+		});
+	}
+	
+	//设置td的align
+	var setTdAlign = function(){
+		$(".helper .set-td-align").each(function(index, element){
+			$(this).on("change",function(){
+				console.log("index:"+index);
+				var value = $(this).children('option:selected').val();
+				console.log("value:"+value);
+				$("table").eq(index).find("td").eq(1).attr('align',value);
+			});
+		});
+	}
+	
+	//插入<h3>
+	var addH3 = function(){
+		$(".helper .addh3").each(function(index, element){
+			$(this).on("click",function(){
+				console.log("index:"+index);
+				console.log("add <h3>");
+				$("table").eq(index).find("td").eq(1).append(
+					'<h3 style="font-size:' + h3DefaultFontSize + ';line-height:' + h3DefaultLineHeight + ';font-weight:' + h3DefaultFontWeight + ';color:' + h3DefaultColor + ';z-index:9;" class="h3draggable">'
+						+ '此处为标题'
+					+ '</h3>'
+				);
+				$(".h3-helper").children().unbind().remove();
+				$(".h3-helper").remove();
+				$(".h3cp").remove();
+				h3Helper();
+			});
+		});
+	}
+	
+	//插入<p>
+	var addP = function(){
+		$(".helper .addp").each(function(index, element){
+			$(this).on("click",function(){
+				console.log("index:"+index);
+				console.log("add <p>");
+				$("table").eq(index).find("td").eq(1).append(
+					'<p style="font-size:' + pDefaultFontSize + ';line-height:' + pDefaultLineHeight + ';font-weight:' + pDefaultFontWeight + ';color:' + pDefaultColor + ';z-index:9;" class="pdraggable">'
+						+ '此处为正文'
+					+ '</p>'
+				);
+				$(".p-helper").children().unbind().remove();
+				$(".p-helper").remove();
+				$(".pcp").remove();
+				pHelper();
+			});
+		});
+	}
+	
+	//去掉h3控件
+	var removeH3Helper = function(h3tableNum,h3Num)
+	{
+		if($(".h3-helper" + h3tableNum + "-" + h3Num) != null)
+		{
+			console.log("removeH3Helper");
+			$(".h3-helper" + h3tableNum + "-" + h3Num).children().unbind().remove();
+			$(".h3-helper" + h3tableNum + "-" + h3Num).remove();
+		}
+		$(".h3cp").remove();
+	}
+	
+	//去掉p控件
+	var removePHelper = function(ptableNum,pNum)
+	{
+		if($(".p-helper" + ptableNum + "-" + pNum) != null)
+		{
+			console.log("removePHelper");
+			$(".p-helper" + ptableNum + "-" + pNum).children().unbind().remove();
+			$(".p-helper" + ptableNum + "-" + pNum).remove();
+		}
+		$(".pcp").remove();
+	}
+	
+	//增加h3控制界面
+	var addH3ControllerFace = function(h3tableNumber,h3Number){
+		console.log("addH3ControllerFace");
+		$(".helper").eq(h3tableNumber).find("div").eq(0).append(
+			'<div class="h3-helper' + h3tableNumber + '-' + h3Number + ' h3-helper' + '" style="width:300px;">'
+				+ '<p style="margin:0;">当前h3-文字大小/行高:</p>'
+				//+ '<input type="text" name="h3-font-size" class="h3-font-size" placeholder="h3-font-size"/>'
+				+ '<input type="text" class="h3-font-size-spinner" name="h3-font-size-spinner" placeholder="h3-font-size-spinner">'
+				//+ '<input type="text" name="h3-line-height" class="h3-line-height" placeholder="h3-line-height"/>'
+				+ '<input type="text" class="h3-line-height-spinner" name="h3-line-height-spinner" placeholder="h3-line-height-spinner">'
+				+ '<br/>'
+				+ '<input type="text" name="h3-color" class="h3-color" style="width:100px;margin-right:15px;" placeholder="点击选择颜色"/>'
+				+ '<input type="text" name="h3-color-more" class="h3-color-more" style="width:100px;" placeholder="输入更多颜色"/>'
+				+ '<br/>'
+				+ '<input type="text" name="h3-margin-top" class="h3-margin-top" style="width:100px;margin-right:15px;" placeholder="margin-top"/>'
+				+ '<input type="text" name="h3-margin-left" class="h3-margin-left" style="width:100px;" placeholder="margin-left"/>'
+				+ '<br/>'
+				+ '<select class="h3-align" style="margin-right:57px;">'
+					+ '<option value="center">center</option>'
+					+ '<option value="left">left</option>'
+					+ '<option value="right">right</option>'
+				+ '</select>'
+				+ '<button class="h3-reset-position">reset-position</button>'
+				+ '<br/>'
+				+ '<textarea class="h3-textarea" style="height:150px;width:250px;" placeholder="h3输入内容">h3输入内容</textarea>'
+			+ '</div>'
+		);
+	}
+	
+	//增加p控制界面
+	var addPControllerFace = function(ptableNumber,pNumber){
+		console.log("addPControllerFace");
+		$(".helper").eq(ptableNumber).find("div").eq(0).append(
+			'<div class="p-helper' + ptableNumber + '-' + pNumber + ' p-helper' + '" style="width:300px;">'
+				+ '<p style="margin:0;">当前p-文字大小/行高:</p>'
+				//+ '<input type="text" name="p-font-size" class="p-font-size" placeholder="p-font-size"/>'
+				+ '<input type="text" class="p-font-size-spinner" name="p-font-size-spinner" placeholder="p-font-size-spinner">'
+				//+ '<input type="text" name="p-line-height" class="p-line-height" placeholder="p-line-height"/>'
+				+ '<input type="text" class="p-line-height-spinner" name="p-line-height-spinner" placeholder="p-line-height-spinner">'
+				+ '<br/>'
+				+ '<input type="text" name="p-color" class="p-color" style="width:100px;margin-right:15px;" placeholder="点击选择颜色"/>'
+				+ '<input type="text" name="p-color-more" class="p-color-more" style="width:100px;" placeholder="输入更多颜色"/>'
+				+ '<br/>'
+				+ '<input type="text" name="p-margin-top" class="p-margin-top" style="width:100px;margin-right:15px;" placeholder="margin-top"/>'
+				+ '<input type="text" name="p-margin-left" class="p-margin-left" style="width:100px;" placeholder="margin-left"/>'
+				+ '<br/>'
+				+ '<select class="p-align" style="margin-right:57px;">'
+					+ '<option value="center">center</option>'
+					+ '<option value="left">left</option>'
+					+ '<option value="right">right</option>'
+				+ '</select>'
+				+ '<button class="p-reset-position">reset-position</button>'
+				+ '<br/>'
+				+ '<textarea class="p-textarea" style="height:150px;width:250px;" placeholder="p输入内容">p输入内容</textarea>'
+			+ '</div>'
+		);
+	}
+	
+	//设置h3控制界面
+	var setH3ControllerFace = function(h3tableNumber,h3Number){
+		//$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-font-size").val(parseInt($("table").eq(h3tableNumber).find("h3").eq(h3Number).css("font-size")));
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-font-size-spinner").spinner();
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-font-size-spinner").spinner("value", parseInt(h3DefaultFontSize));
+		//$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-line-height").val(parseInt($("table").eq(h3tableNumber).find("h3").eq(h3Number).css("line-height")));
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-line-height-spinner").spinner();
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-line-height-spinner").spinner("value", parseInt(h3DefaultLineHeight));
+		//$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-color").val($("table").eq(h3tableNumber).find("h3").eq(h3Number).css("color"));
+		//$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-color-more").val($("table").eq(h3tableNumber).find("h3").eq(h3Number).css("color"));
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-textarea").html($("table").eq(h3tableNumber).find("h3").eq(h3Number).html());
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-font-size-spinner").css("width","50px");
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-line-height-spinner").css("width","50px");
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find("span").eq(0).css("margin-right","39px");
+		//$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-color").css({"width":"100px","margin-right":"15px"});
+		//$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-color-more").css("width","100px");
+		//$(".h3-helper" + h3tableNumber + "-" + h3Number).find("h3-align").css("margin-right","57px");
+	}
+	
+	//设置p控制界面
+	var setPControllerFace = function(ptableNumber,pNumber){
+		//$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size").val(parseInt($("table").eq(ptableNumber).find("p").eq(pNumber).css("font-size")));
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner();
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner("value", parseInt(pDefaultFontSize));
+		//$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height").val(parseInt($("table").eq(ptableNumber).find("p").eq(pNumber).css("line-height")));
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner();
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner("value", parseInt(pDefaultLineHeight));
+		//$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color").val($("table").eq(ptableNumber).find("p").eq(pNumber).css("color"));
+		//$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color-more").val($("table").eq(ptableNumber).find("p").eq(pNumber).css("color"));
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-textarea").html($("table").eq(ptableNumber).find("p").eq(pNumber).html());
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").css("width","50px");
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").css("width","50px");
+		$(".p-helper" + ptableNumber + "-" + pNumber).find("span").eq(0).css("margin-right","39px");
+		//$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color").css({"width":"100px","margin-right":"15px"});
+		//$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color-more").css("width","100px");
+		//$(".p-helper" + ptableNumber + "-" + pNumber).find("p-align").css("margin-right","57px");
+	}
+	
+	//改变h3字体大小
+	var h3FontSize = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-font-size").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			console.log("font-size:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+			if(isNaN(value))
+			{
+				value = 10;
+			}
+			else if(value < 10 || value > 80)
+			{
+				value = 10;
+			}
+			$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("font-size",value + "px");
+		});
+	}
+	
+	//spinner改变h3字体大小
+	var h3FontSizeSpinner = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-font-size-spinner").spinner({
+			min:10,
+			max:150,
+			spin: function( event, ui ) {
+				console.log("spinner-font-size:" + ui.value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("font-size",ui.value + "px");
+			}
+		});
+	}
+	
+	//spinner改变p字体大小
+	var pFontSizeSpinner = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner({
+			min:10,
+			max:150,
+			spin: function( event, ui ) {
+				console.log("spinner-font-size:" + ui.value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("font-size",ui.value + "px");
+			}
+		});
+	}
+	
+	//改变p字体大小
+	var pFontSize = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			console.log("font-size:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if(isNaN(value))
+			{
+				value = 10;
+			}
+			else if(value < 10 || value > 80)
+			{
+				value = 10;
+			}
+			$("table").eq(ptableNumber).find("p").eq(pNumber).css("font-size",value + "px");
+		});
+	}
+	
+	//改变h3行高
+	var h3LineHeight = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-line-height").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			console.log("line-height:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+			if(isNaN(value))
+			{
+				value = 20;
+			}
+			else if(value < 20 || value > 150)
+			{
+				value = 20;
+			}
+			$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("line-height",value + "px");
+		});
+	}
+	
+	//spinner改变h3行高
+	var h3LineHeightSpinner = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-line-height-spinner").spinner({
+			min:10,
+			max:150,
+			spin: function( event, ui ) {
+				console.log("spinner-line-height:" + ui.value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("line-height",ui.value + "px");
+			}
+		});
+	}
+	
+	//spinner改变p行高
+	var pLineHeightSpinner = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner({
+			min:10,
+			max:150,
+			spin: function( event, ui ) {
+				console.log("spinner-line-height:" + ui.value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("line-height",ui.value + "px");
+			}
+		});
+	}
+	
+	//改变p行高
+	var pLineHeight = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			console.log("line-height:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if(isNaN(value))
+			{
+				value = 20;
+			}
+			else if(value < 20 || value > 150)
+			{
+				value = 20;
+			}
+			$("table").eq(ptableNumber).find("p").eq(pNumber).css("line-height",value + "px");
+		});
+	}
+	
+	//改变h3颜色
+	var h3Color = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-color").colorpicker({
+			fillcolor:true,
+			event:'click',
+			target:$("table").eq(h3tableNumber).find("h3").eq(h3Number),
+			success:function(o,color){
+				$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-color").val(color)
+			}
+		});
+		$(".colorpanel").each(function(index, element) {
+            if($(".colorpanel").eq(index).attr("class").indexOf("pcp") == -1)
+			{
+				$(".colorpanel").eq(index).addClass("h3cp");
+			}
+        });
+		
+	}
+	
+	//输入更多h3颜色
+	var h3ColorMore = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-color-more").bind('input propertychange',function(){
+			var value = $(this).val();
+			var reg = /^[0-9a-f]{6}$/;
+			console.log("color:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+			if(reg.test(value))
+			{
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("color","#"+value);
+				if($.inArray(value,globalColor) < 0){
+					globalColor.push(value);
+					initialGlobalColor();
+				}
+			}
+			else
+			{
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("color","#ff0000");
+			}
+		});
+	}
+	
+	//改变p颜色
+	var pColor = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color").colorpicker({
+			fillcolor:true,
+			event:'click',
+			target:$("table").eq(ptableNumber).find("p").eq(pNumber),
+			success:function(o,color){
+				$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color").val(color)
+			}
+		});
+		$(".colorpanel").each(function(index, element) {
+            if($(".colorpanel").eq(index).attr("class").indexOf("h3cp") == -1)
+			{
+				$(".colorpanel").eq(index).addClass("pcp");
+			}
+        });
+	}
+	
+	//输入更多p颜色
+	var pColorMore = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color-more").bind('click',function(){
+			var value = $(this).val();
+			var reg = /^[0-9a-f]{6}$/;
+			console.log("color:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if(reg.test(value))
+			{
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("color","#"+value);
+				if ($.inArray(value, globalColor) < 0) {
+					globalColor.push(value);
+					initialGlobalColor();
+				}
+			}
+			else
+			{
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("color","#0000ff");
+			}
+		});
+	}
+	
+	//改变h3 align
+	var h3Align = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-align").on("change",function(){
+			var value = $(this).children("option:selected").val();
+			console.log("align:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+			$("table").eq(h3tableNumber).find("h3").eq(h3Number).attr("align",value);
+		});
+	}
+	
+	//改变p align
+	var pAlign = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-align").on("change",function(){
+			var value = $(this).children("option:selected").val();
+			console.log("align:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			$("table").eq(ptableNumber).find("p").eq(pNumber).attr("align",value);
+		});
+	}
+	
+	//重置h3位置
+	var h3ResetPosition = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-reset-position").on("click",function(){
+			console.log("reset h3 position," + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number)
+			$("table").eq(h3tableNumber).find("h3").eq(h3Number).css({
+				"left":"0px",
+				"top":"0px"
+			});
+		});
+	}
+	
+	//重置p位置
+	var pResetPosition = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-reset-position").on("click",function(){
+			console.log("reset p position," + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber)
+			$("table").eq(ptableNumber).find("p").eq(pNumber).css({
+				"left":"0px",
+				"top":"0px"
+			});
+		});
+	}
+	
+	//输入h3内容
+	var h3Textarea = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-textarea").bind('input propertychange',function(){
+			var value = $(this).val().replace(/ /g,"&nbsp;").replace(/\n/g,'<font style="font-family: Arial"><br /></font>');
+			console.log("textarea:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+			$("table").eq(h3tableNumber).find("h3").eq(h3Number).html(value);
+			if(value.length == 0)
+			{
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).html("h3待输入内容");
+			}
+		});
+	}
+	
+	//输入p内容
+	var pTextarea = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-textarea").bind('input propertychange',function(){
+			var value = $(this).val().replace(/ /g,"&nbsp;").replace(/\n/g,'<font style="font-family: Arial"><br /></font>');
+			console.log("textarea:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			$("table").eq(ptableNumber).find("p").eq(pNumber).html(value);
+			if(value.length == 0)
+			{
+				$("table").eq(ptableNumber).find("p").eq(pNumber).html("p待输入内容");
+			}
+		});
+	}
+	
+	//设置<h3>margin-top
+	var h3MarginTop = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-margin-top").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			var height = parseInt($("table").eq(h3tableNumber).height());
+			console.log("margin-top:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+			if(isNaN(value))
+			{
+				var fz = parseInt($("table").eq(h3tableNumber).find("h3").eq(h3Number).css("font-size"));
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-top", fz + "px");
+			}
+			else if(Math.abs(value) > height)
+			{
+				if(value < 0)
+				{
+					$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-top","-" + height + "px");
+				}
+				else
+				{
+					$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-top",height + "px");
+				}
+			}
+			else
+			{
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-top",value + "px");
+			}
+		});
+	}
+	
+	//设置<p>margin-top
+	var pMarginTop = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-margin-top").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			var height = parseInt($("table").eq(ptableNumber).height());
+			console.log("margin-top:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if(isNaN(value))
+			{	
+				var fz = parseInt($("table").eq(ptableNumber).find("p").eq(pNumber).css("font-size"));
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-top", fz + "px");
+			}
+			else if(Math.abs(value) > height)
+			{
+				if(value < 0)
+				{
+					$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-top","-" + height + "px");
+				}
+				else
+				{
+					$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-top",height + "px");
+				}
+			}
+			else
+			{
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-top",value + "px");
+			}
+		});
+	}
+	
+	//设置<h3>margin-left
+	var h3MarginLeft = function(h3tableNumber,h3Number){
+		$(".h3-helper" + h3tableNumber + "-" + h3Number).find(".h3-margin-left").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			var width = parseInt($("table").eq(h3tableNumber).width());
+			console.log("margin-top:" + value + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+			if(isNaN(value))
+			{
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-left","0px");
+			}
+			else if(Math.abs(value) > width)
+			{
+				if(value < 0)
+				{
+					$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-left","-" + width + "px");
+				}
+				else
+				{
+					$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-left",width + "px");
+				}
+			}
+			else
+			{
+				$("table").eq(h3tableNumber).find("h3").eq(h3Number).css("margin-left",value + "px");
+			}
+		});
+	}
+	
+	//设置<p>margin-left
+	var pMarginLeft = function(ptableNumber,pNumber){
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-margin-left").bind('input propertychange',function(){
+			var value = parseInt($(this).val());
+			var width = parseInt($("table").eq(ptableNumber).width());
+			console.log("margin-top:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if(isNaN(value))
+			{
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-left","0px");
+			}
+			else if(Math.abs(value) > width)
+			{
+				if(value < 0)
+				{
+					$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-left","-" + width + "px");
+				}
+				else
+				{
+					$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-left",width + "px");
+				}
+			}
+			else
+			{
+				$("table").eq(ptableNumber).find("p").eq(pNumber).css("margin-left",value + "px");
+			}
+		});
+	}
+	
+	//<h3>功能模块
+	var h3ModuleFunction = function(h3tableNumber,h3Number){
+		addH3ControllerFace(h3tableNumber,h3Number);
+		setH3ControllerFace(h3tableNumber,h3Number);
+		//h3FontSize(h3tableNumber,h3Number);
+		h3FontSizeSpinner(h3tableNumber,h3Number);
+		//h3LineHeight(h3tableNumber,h3Number);
+		h3LineHeightSpinner(h3tableNumber,h3Number);
+		h3Color(h3tableNumber,h3Number);
+		h3ColorMore(h3tableNumber,h3Number);
+		h3Align(h3tableNumber,h3Number);
+		h3ResetPosition(h3tableNumber,h3Number);
+		h3Textarea(h3tableNumber,h3Number);
+		h3MarginTop(h3tableNumber,h3Number);
+		h3MarginLeft(h3tableNumber,h3Number);
+	}
+	
+	//<p>功能模块
+	var pModuleFunction = function(ptableNumber,pNumber){
+		addPControllerFace(ptableNumber,pNumber);
+		setPControllerFace(ptableNumber,pNumber);
+		//pFontSize(ptableNumber,pNumber);
+		pFontSizeSpinner(ptableNumber,pNumber);
+		//pLineHeight(ptableNumber,pNumber);
+		pLineHeightSpinner(ptableNumber,pNumber);
+		pColor(ptableNumber,pNumber);
+		pColorMore(ptableNumber,pNumber);
+		pAlign(ptableNumber,pNumber);
+		pResetPosition(ptableNumber,pNumber);
+		pTextarea(ptableNumber,pNumber);
+		pMarginTop(ptableNumber,pNumber);
+		pMarginLeft(ptableNumber,pNumber);
+	}
+	
+	//<h3>帮助模块
+	var h3Helper = function(){
+		var h3tableNum = -1;
+		var h3Num = -1;
+		var h3LeftOldNum = 0;
+		var h3TopOldNum = 0;
+		$(".h3draggable").draggable({
+			start: function() {
+				console.log("start");
+				console.log($(this));
+				var h3table = $(this).parent().parent().parent().parent();
+				var h3tableNumber = $("table").index(h3table);
+				var h3Number = $(this).parent().find("h3").index($(this));
+				var h3LeftOldNumber = parseInt($(this).css("left"));
+				var h3TopOldNumber = parseInt($(this).css("top"));
+				console.log("old h3tableNumber:" + h3tableNum + " old h3Number:" + h3Num);
+				console.log("click h3" + " h3tableNumber:" + h3tableNumber + " h3Number:" + h3Number);
+				console.log("h3LeftOldNumber:" + h3LeftOldNumber + " h3TopOldNumber:" + h3TopOldNumber);
+				if(h3tableNumber != h3tableNum || h3Number != h3Num)
+				{
+					removeH3Helper(h3tableNum,h3Num);
+					
+					h3tableNum = h3tableNumber;
+					h3Num = h3Number;
+					
+					h3ModuleFunction(h3tableNumber,h3Number);
+				}
+				else
+				{
+					h3LeftOldNum = h3LeftOldNumber;
+					h3TopOldNum = h3TopOldNumber;
+				}
+			},
+			drag: function() {
+				console.log("drag");
+			},
+			stop: function() {
+				console.log("stop");
+				var h3LeftNewNumber = parseInt($(this).css("left"));
+				var h3TopNewNumber = parseInt($(this).css("top"));
+				console.log("h3LeftNewNumber:" + h3LeftNewNumber + " h3TopNewNumber:" + h3TopNewNumber);
+				var h3Left = Math.abs(h3LeftNewNumber - h3LeftOldNum);
+				var h3Top = Math.abs(h3TopNewNumber - h3TopOldNum);
+				if(h3Left + h3Top <= 10)
+				{
+					$(this).css({
+						"left":h3LeftOldNum+"px",
+						"top":h3TopOldNum+"px"
+					});
+				}
+				var h3MarginTop = parseInt($(this).css("margin-top"));
+				var h3MarginLeft = parseInt($(this).css("margin-left"));
+				$(".helper").eq(h3tableNum).find(".h3-font-size-spinner").val(parseInt($(this).css("font-size")));
+				$(".helper").eq(h3tableNum).find(".h3-line-height-spinner").val(parseInt($(this).css("line-height")));
+				if(!isNaN(h3MarginTop)){
+					$(".helper").eq(h3tableNum).find(".h3-margin-top").val(h3MarginTop);
+				}
+				if(!isNaN(h3MarginLeft)){
+					$(".helper").eq(h3tableNum).find(".h3-margin-left").val(h3MarginLeft);
+				}
+			}
+		});
+	}
+	
+	//<p>帮助模块
+	var pHelper = function(){
+		var ptableNum = -1;
+		var pNum = -1;
+		var pLeftOldNum = 0;
+		var pTopOldNum = 0;
+		$(".pdraggable").draggable({
+			start: function() {
+				console.log("start");
+				console.log($(this));
+				var ptable = $(this).parent().parent().parent().parent();
+				var ptableNumber = $("table").index(ptable);
+				var pNumber = $(this).parent().find("p").index($(this));
+				var pLeftOldNumber = parseInt($(this).css("left"));
+				var pTopOldNumber = parseInt($(this).css("top"));
+				console.log("old ptableNumber:" + ptableNum + " old pNumber:" + pNum);
+				console.log("click p" + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+				console.log("pLeftOldNumber:" + pLeftOldNumber + " pTopOldNumber:" + pTopOldNumber);
+				if(ptableNumber != ptableNum || pNumber != pNum)
+				{
+					removePHelper(ptableNum,pNum);
+					
+					ptableNum = ptableNumber;
+					pNum = pNumber;
+					
+					pModuleFunction(ptableNumber,pNumber);
+				}
+				else
+				{
+					pLeftOldNum = pLeftOldNumber;
+					pTopOldNum = pTopOldNumber;
+				}
+			},
+			drag: function() {
+				console.log("drag");
+			},
+			stop: function() {
+				console.log("stop");
+				var pLeftNewNumber = parseInt($(this).css("left"));
+				var pTopNewNumber = parseInt($(this).css("top"));
+				console.log("pLeftNewNumber:" + pLeftNewNumber + " pTopNewNumber:" + pTopNewNumber);
+				var pLeft = Math.abs(pLeftNewNumber - pLeftOldNum);
+				var pTop = Math.abs(pTopNewNumber - pTopOldNum);
+				if(pLeft + pTop <= 10)
+				{
+					$(this).css({
+						"left":pLeftOldNum+"px",
+						"top":pTopOldNum+"px"
+					});
+				}
+				var pMarginTop = parseInt($(this).css("margin-top"));
+				var pMarginLeft = parseInt($(this).css("margin-left"));
+				$(".helper").eq(ptableNum).find(".p-font-size-spinner").val(parseInt($(this).css("font-size")));
+				$(".helper").eq(ptableNum).find(".p-line-height-spinner").val(parseInt($(this).css("line-height")));
+				if(!isNaN(pMarginTop)){
+					$(".helper").eq(ptableNum).find(".p-margin-top").val(pMarginTop);
+				}
+				if(!isNaN(pMarginLeft)){
+					$(".helper").eq(ptableNum).find(".p-margin-left").val(pMarginLeft);
+				}
+			}
+		});
+	}
+	
+	//移除<h3>,<p>
+	var removeH3P = function(){
+		$(".helper .remove-h3-p").each(function(index, element){
+			$(this).on("click",function(){
+				console.log("index:"+index);
+				console.log("remove <h3> <p>");
+				$("table").eq(index).find("td").eq(1).children().remove();
+			});
+		});
+	}
+	
+	//移除table
+	var removeTable = function(){
+		$(".helper .remove-table").each(function(index, element){
+			console.log("11111");
+			console.log($(this));
+			$(this).on("click",function(){
+				console.log("22222");
+				console.log($(this));
+				console.log("index:"+index);
+				console.log("remove table");
+				$(this).parent().parent('.helper').prev('table').remove();
+				$(this).parent().parent('.helper').remove();
+				//$(".helper").eq(index).remove();
+				//$("table").eq(index).remove();
+				addNumber--;
+				console.log('addNumber:'+addNumber);
+				if(addNumber == 0)
+				{
+					$("#" + productNameSubmit + "-main").remove();
+				}
+			});
+		});
+	}
+	
+	//水平参考线控制器界面
+	var hhrControllerFace = function(hhrTableNumber,hhrLength,buttonThis){
+		console.log("hhrControllerFace");
+		buttonThis.parent().next().append(
+			'<input type="text" name="set-hhr" class="set-hhr" placeholder="输入y轴位置" style="width:100px;margin-right:15px;"/>'
+			+ '<button class="remove-hhr">移除水平参考线</button>'
+		);
+		$("table").eq(hhrTableNumber).find("td").eq(1).css("position","relative");
+		$("table").eq(hhrTableNumber).find("td").eq(1).append('<hr class="hr-horizontal" style="position:absolute;top:0;left:0;width:100%;border:1px solid purple;margin:0px;">');
+		
+		var hhrLeft = $("table").eq(hhrTableNumber).find("td").eq(0).width();
+		//var hhrWindowWidth = $(window).width();
+		//var hhrTableWidth = $("table").eq(hhrTableNumber).width();
+		//var hhrWidth = hhrWindowWidth > hhrTableWidth ? hhrTableWidth : hhrWindowWidth;
+		var hhrWidth = $(window).width();
+		$("table").eq(hhrTableNumber).find("td").eq(1).find("hr").css({
+			"left":"-"+hhrLeft+"px",
+			"width":hhrWidth+"px"
+		});
+	}
+	
+	//水平参考线屏幕适应
+	$(window).resize(function(){
+		var hhrLeft = $("table").eq(0).find("td").eq(0).width();
+		//var hhrWindowWidth = $(window).width();
+		//var hhrTableWidth = $("table").eq(hhrTableNumber).width();
+		//var hhrWidth = hhrWindowWidth > hhrTableWidth ? hhrTableWidth : hhrWindowWidth;
+		var hhrWidth = $(window).width();
+		$("table").find("td").eq(1).find("hr").css({
+			"left":"-"+hhrLeft+"px",
+			"width":hhrWidth+"px"
+		});
+	});
+	
+	//设置hhr input值
+	var hhrControllerSet = function(hhrTableNumber,hhrLength,buttonThis){
+		buttonThis.parent().next().children(".set-hhr").each(function(index, element) {
+			var top = parseInt($("table").eq(hhrTableNumber).find("td").eq(1).find(".hr-horizontal").eq(index).css("top"));
+			$(this).val(top);
+		});
+	}
+	
+	//水平参考线输入框事件
+	var setHhr = function(hhrTableNumber,hhrLength,buttonThis){
+		console.log("setHhr");
+		buttonThis.parent().next().children(".set-hhr").each(function(index, element) {
+			$(this).bind("input propertychange keydown",function(event){
+				var val = parseInt($(this).val());
+				console.log("hhr:" + $("table").eq(hhrTableNumber).find(".set-hhr").index($(this)) + " top:" + val);
+				if(isNaN(val))
+				{
+					val = 0;
+				}
+				if(event.keyCode == 38 || event.keyCode == 39)
+				{
+					val++;
+		　　　	}
+				else if (event.keyCode == 37 || event.keyCode == 40)
+				{
+					val--;
+		　　　	}
+				if(val >= $("table").eq(hhrTableNumber).height())
+				{
+					val = $("table").eq(hhrTableNumber).height();
+				}
+				else if(val < 0)
+				{
+					val = 0;
+				}
+				$(this).val(val);
+				$("table").eq(hhrTableNumber).find("td").eq(1).find(".hr-horizontal").eq(index).css("top",val + "px");
+			});
+		});
+	}
+	
+	//"移除水平参考线"事件
+	var removeHhr = function(hhrTableNumber,hhrLength,buttonThis){
+		console.log("removeHhr");
+		buttonThis.parent().next().children(".remove-hhr").each(function(index, element) {
+			$(this).on("click",function(){
+				console.log($("table").eq(hhrTableNumber).find("td").eq(1).find(".hr-horizontal").eq(index));
+				var i = buttonThis.parent().next().children(".remove-hhr").index(this);
+				console.log("remove2:"+i);
+				$("table").eq(hhrTableNumber).find("td").eq(1).find(".hr-horizontal").eq(i).remove();
+				$(this).prev().unbind().remove();
+				$(this).unbind().remove();
+				console.log("hhrNumber:"+$("table").eq(hhrTableNumber).find("hr").length);
+				if($("table").eq(hhrTableNumber).find("hr").length == 0)
+				{
+					console.log("remove div");
+					buttonThis.parent().next().remove();
+				}
+			});
+		});
+	}
+	
+	//水平参考线控制器事件
+	var hhrControllerEvent = function(hhrTableNumber,hhrLength,buttonThis){
+		buttonThis.parent().next().children().unbind();
+		setHhr(hhrTableNumber,hhrLength,buttonThis);
+		removeHhr(hhrTableNumber,hhrLength,buttonThis);
+	}
+	
+	//"添加水平参考线"点击
+	var addHhr = function(){
+		$(".helper .add-hr-horizontal .add-hhr").on("click",function(){
+			var hhrTableNumber = $(".helper").index($(this).parent().parent().parent());
+			var hhrLength = $("table").eq(hhrTableNumber).find("hr").length;
+			var buttonThis = $(this);
+			
+			if(hhrLength == 0)
+			{
+				console.log("add div");
+				buttonThis.parent().after(
+					'<div class="hhr-helper" style="width:300px;"></div>'
+				);
+			}
+			hhrControllerFace(hhrTableNumber,hhrLength,buttonThis);
+			hhrControllerSet(hhrTableNumber,hhrLength,buttonThis);
+			hhrControllerEvent(hhrTableNumber,hhrLength,buttonThis);
+		});
+	}
+
+	//显示全局颜色到textarea
+	var initialGlobalColor = function(){
+		var colorStr = "";
+		for(var i = 0;i < globalColor.length;i++){
+			colorStr += globalColor[i];
+			colorStr += "/";
+		}
+		$(".global-color").val(colorStr);
+	}
+	
+	//注册控制器监听事件
+	var addControllerEvent = function()
+	{
+		$(".helper .table-helper").children().unbind();
+		$(".helper .add-hr-horizontal").children().unbind();
+		changeTableHeight();
+		setTdAlign();
+		addH3();
+		addP();
+		removeH3P();
+		removeTable();
+		addHhr();
+		initialGlobalColor();
+	}
+	
+	//添加控制器
+	var addController = function(){
+		addControllerFace();
+		addControllerEvent();
+	}
+	
+	$(function(){
+		//“选项确认”点击
+		$("#set-option .option-submit").on("click",function(){
+			//获取输入的数据
+			var productName = $("#set-option .product-name").val();
+			var optionVal = $("#set-option .td-auto option:selected").val();
+			var middleWidth = parseInt($("#set-option .main-width").val());
+			var sideWidth = parseInt($("#set-option .no-auto-width").val());
+			var tableWidth = parseInt($("#set-option .total-width").val());
+			var fontFamily = $("#set-option .font-family option:selected").val();
+			
+			init();
+			var judge = validateData(productName,optionVal,middleWidth,sideWidth,tableWidth,fontFamily);
+			if(judge)
+			{
+				if(optionVal == "yes")
+				{
+					submitValue(productName,1,middleWidth,0,tableWidth,fontFamily);
+					modifyMFTable();
+				}
+				else
+				{
+					submitValue(productName,0,middleWidth,sideWidth,0,fontFamily);
+					modifyTLTable();
+				}
+				$("hr").remove();
+				$(".helper").find(".hhr-helper").children().unbind().remove();
+				$(".helper").find(".hhr-helper").remove();
+				$(".vhr-helper").children().unbind().remove();
+				$(".vhr-helper").remove();
+				vhrNumber = 0;
+			}
+		});
+		
+		//"选择td是否使用auto"改变
+		$("#set-option .td-auto").change(function(){
+			var optionVal = $(this).children('option:selected').val(); 
+			if(optionVal == "选择td是否使用auto")
+			{
+				console.log("选择td是否使用auto");
+			}
+			else if(optionVal == "yes")
+			{
+				console.log("yes");
+				$("#set-option .no-auto-width").val("").attr("disabled",true);
+				$("#set-option .total-width").val("").attr("disabled",false);
+			}
+			else
+			{
+				console.log("no");
+				$("#set-option .total-width").val("").attr("disabled",true);
+				$("#set-option .no-auto-width").val("").attr("disabled",false);
+			}
+		});
+		
+		//“add”点击
+		$("#append-new .add").on("click",function(){
+			if(alreadyCommit == 0)
+			{
+				alert("选项确认");	
+			}
+			else
+			{
+				//添加table内容
+				addContent();
+				//插入可视化控制器
+				addController();
+			}
+		});
+		
+		//垂直参考线控制器界面
+		var vhrControllerFace = function(){
+			console.log("vhrControllerFace");
+			//添加垂直参考线控制界面
+			$(".vhr-helper").append(
+				'<input type="text" name="set-vhr" class="set-vhr" placeholder="输入x轴位置" style="width:100px;margin-right:15px;"/>'
+				+ '<button class="remove-vhr">移除垂直参考线</button>'
+			);
+			//添加垂直参考线
+			$("body").append('<hr class="hr-vertical" style="position:absolute;left:1px;top:0px;height:20000px;border:1px solid green;margin:0px;">');
+		}
+		
+		//设置vhr input值
+		var vhrControllerSet = function(){
+			$(".vhr-helper .set-vhr").each(function(index, element) {
+				//设置垂直参考线输入框值
+				var left = parseInt($(".hr-vertical").eq(index).css("left"));
+				$(this).val(left);
+			});
+		}
+		
+		//垂直参考线输入框事件
+		var setVhr = function(){
+			console.log("setVhr");
+			$(".vhr-helper .set-vhr").each(function(index, element) {
+                $(this).bind("input propertychange keydown",function(event){
+					var val = parseInt($(this).val());
+					console.log("vhr:" + $(".set-vhr").index($(this)) + " left:" + val);
+					if(isNaN(val))
+					{
+						val = 1;
+					}
+					if(event.keyCode == 38 || event.keyCode == 39)
+					{
+						val++;
+			　　　	}
+					else if (event.keyCode == 37 || event.keyCode == 40)
+					{
+						val--;
+			　　　	}
+					if(val >= 2560)
+					{
+						val = 2559;
+					}
+					else if(val <= 0)
+					{
+						val = 1;
+					}
+					$(this).val(val);
+					$(".hr-vertical").eq(index).css("left",val + "px");
+				});
+            });
+		}
+		
+		//"移除垂直参考线"事件
+		var removeVhr = function(){
+			console.log("removeVhr");
+			$(".vhr-helper .remove-vhr").each(function(index, element) {
+                $(this).on("click",function(){
+					console.log($(".hr-vertical").eq(index));
+					var i = $(".vhr-helper .remove-vhr").index(this);
+					console.log("remove2:"+i);
+					$(".hr-vertical").eq(i).remove();
+					//$(".vhr-helper .set-vhr").eq(index).unbind().remove();
+					$(this).prev().unbind().remove();
+					$(this).unbind().remove();
+					vhrNumber--;
+					console.log("vhrNumber:"+vhrNumber);
+					if(vhrNumber == 0)
+					{
+						console.log("remove div");
+						$(".vhr-helper").remove();
+					}
+				});
+            });
+		}
+		
+		//垂直参考线控制器事件
+		var vhrControllerEvent = function(){
+			$(".vhr-helper").children().unbind();
+			setVhr();
+			removeVhr();
+		}
+		
+		//"添加垂直参考线"点击
+		$("#add-hr-vertical .add-vhr").on("click",function(){
+			vhrNumber++;
+			console.log("vhrNumber:"+vhrNumber);
+			if(vhrNumber == 1)
+			{
+				console.log("add div");
+				$("#add-hr-vertical").after(
+					'<div class="vhr-helper" style="width:300px;"></div>'
+				);
+			}
+			vhrControllerFace();
+			vhrControllerSet();
+			vhrControllerEvent();
+		});
+		
+		//h3字体大小确认
+		$(".global-h3-font-size-submit").on("click",function(){
+			var globalH3FontSize = parseInt($(".global-h3-font-size").val());
+			if(isNaN(globalH3FontSize)){
+				globalH3FontSize = "30px";
+			}
+			else{
+				globalH3FontSize += "px";
+			}
+			h3DefaultFontSize = globalH3FontSize;
+			$("h3").css("font-size",h3DefaultFontSize);
+			$(".h3-font-size-spinner").val(parseInt(h3DefaultFontSize));
+			console.log("h3字体大小确认:"+h3DefaultFontSize);
+		});
+		
+		//h3行高确认
+		$(".global-h3-line-height-submit").on("click",function(){
+			var globalH3LineHeight = parseInt($(".global-h3-line-height").val());
+			if(isNaN(globalH3LineHeight)){
+				globalH3LineHeight = "30px";
+			}
+			else{
+				globalH3LineHeight += "px";
+			}
+			h3DefaultLineHeight = globalH3LineHeight;
+			$("h3").css("line-height",h3DefaultLineHeight);
+			$(".h3-line-height-spinner").val(parseInt(h3DefaultLineHeight));
+			console.log("h3行高确认:"+h3DefaultLineHeight);
+		});
+		
+		//h3字体粗细确认
+		$(".global-h3-font-weight-submit").on("click",function(){
+			var globalH3FontWeight = $(".global-h3-font-weight").val();
+			h3DefaultFontWeight = globalH3FontWeight;
+			$("h3").css("font-weight",h3DefaultFontWeight);
+			console.log("h3字体粗细确认:"+h3DefaultFontWeight);
+		});
+		
+		//h3字体颜色确认
+		$(".global-h3-color-submit").on("click",function(){
+			var globalH3Color = $(".global-h3-color").val();
+			var colorReg = /^[0-9a-f]{6}$/;
+			if(colorReg.test(globalH3Color)){
+				globalH3Color = "#" + globalH3Color;
+			}
+			else{
+				globalH3Color = "#ff0000";
+			}
+			h3DefaultColor = globalH3Color;
+			$("h3").css("color",h3DefaultColor);
+			$(".h3-color-more").val(h3DefaultColor.slice(1));
+			console.log("h3字体颜色确认:"+h3DefaultColor);
+		});
+		
+		//p字体大小确认
+		$(".global-p-font-size-submit").on("click",function(){
+			var globalPFontSize = parseInt($(".global-p-font-size").val());
+			if(isNaN(globalPFontSize)){
+				globalPFontSize = "16px";
+			}
+			else{
+				globalPFontSize += "px";
+			}
+			pDefaultFontSize = globalPFontSize;
+			$("p").css("font-size",pDefaultFontSize);
+			$(".p-font-size-spinner").val(parseInt(pDefaultFontSize));
+			console.log("p字体大小确认:"+pDefaultFontSize);
+		});
+		
+		//p行高确认
+		$(".global-p-line-height-submit").on("click",function(){
+			var globalPLineHeight = parseInt($(".global-p-line-height").val());
+			if(isNaN(globalPLineHeight)){
+				globalPLineHeight = "26px";
+			}
+			else{
+				globalPLineHeight += "px";
+			}
+			pDefaultLineHeight = globalPLineHeight;
+			$("p").css("line-height",pDefaultLineHeight);
+			$(".p-line-height-spinner").val(parseInt(pDefaultLineHeight));
+			console.log("p行高确认:"+pDefaultLineHeight);
+		});
+		
+		//p字体粗细确认
+		$(".global-p-font-weight-submit").on("click",function(){
+			var globalPFontWeight = $(".global-p-font-weight").val();
+			pDefaultFontWeight = globalPFontWeight;
+			$("p").css("font-weight",pDefaultFontWeight);
+			console.log("p字体粗细确认:"+pDefaultFontWeight);
+		});
+		
+		//p字体颜色确认
+		$(".global-p-color-submit").on("click",function(){
+			var globalPColor = $(".global-p-color").val();
+			var colorReg = /^[0-9a-f]{6}$/;
+			if(colorReg.test(globalPColor)){
+				globalPColor = "#" + globalPColor;
+			}
+			else{
+				globalPColor = "#ff0000";
+			}
+			pDefaultColor = globalPColor;
+			$("p").css("color",pDefaultColor);
+			$(".p-color-more").val(pDefaultColor.slice(1));
+			console.log("p字体颜色确认:"+pDefaultColor);
+		});
+		
+		//“end”点击
+		$("#commit .end").on("click",function(){
+			
+			$("h3").each(function(index, element) {
+				var fz = $(this).css("font-size");
+				var fznum = parseInt(fz);
+				var mt = parseInt($(this).css("margin-top"));
+				var ml = parseInt($(this).css("margin-left"));
+				var mb = parseInt($(this).css("margin-bottom"));
+				var mr = parseInt($(this).css("margin-right"));
+				if(mt == fznum && mb == fznum && ml == 0 && mr == 0)
+				{
+					$(this).css("margin",fz + " 0 " + fz + " 0 ");
+				}
+				$(this).css("z-index","");
+            });
+			
+			$("p").each(function(index, element) {
+				var fz = $(this).css("font-size");
+				var fznum = parseInt(fz);
+				var mt = parseInt($(this).css("margin-top"));
+				var ml = parseInt($(this).css("margin-left"));
+				var mb = parseInt($(this).css("margin-bottom"));
+				var mr = parseInt($(this).css("margin-right"));
+				if(mt == fznum && mb == fznum && ml == 0 && mr == 0)
+				{
+					$(this).css("margin",fz + " 0 " + fz + " 0 ");
+				}
+				$(this).css("z-index","");
+            });
+			
+			$(".h3draggable").unbind().removeAttr("class");
+			$(".pdraggable").unbind().removeAttr("class");
+			$(".colorpanel").unbind().remove();
+			$(".global-h3-font-size-submit,.global-h3-line-height-submit,.global-h3-font-weight-submit,.global-h3-color-submit,.global-p-font-size-submit,.global-p-line-height-submit,.global-p-font-weight-submit,.global-p-color-submit").unbind().remove();
+			$("#set-option,#append-new,#commit,#set-h3,#set-p,#export,.helper,script,.blank,#add-hr-vertical,.vhr-helper,hr").remove();
+			$("link").eq(0).remove();
+			$("table").find("td").eq(1).css("position","");
+		});
+	});
+</script>
+
+<body style="padding:0;margin:0;">
+	<div id="set-option">
+    	<input type="text" name="product-name" class="product-name" placeholder="产品型号(英文)"/>
+    	<select name="select" class="td-auto">
+    	  <option value="选择td是否使用auto">选择td是否使用auto</option>
+    	  <option value="yes">yes</option>
+    	  <option value="no">no</option>
+  	  	</select>
+    	<input type="text" name="main-width" class="main-width" placeholder="中间td的宽度(px)不少于500"/>
+        <input type="text" name="no-auto-width" class="no-auto-width" placeholder="不使用auto时两边td宽度(px)不少于500"/>
+		<input type="text" name="total-width" class="total-width" placeholder="table宽度(px)不少于500"/>
+		<select name="select2" class="font-family">
+			<option value="选择字体">选择字体</option>
+			<option value="Bold">Bold</option>
+			<option value="ExtraLight">ExtraLight</option>
+			<option value="Bold">Light</option>
+			<option value="ExtraLight">Medium</option>
+			<option value="Bold">Normal</option>
+			<option value="ExtraLight">Regular</option>
+		</select>
+        <button class="option-submit">选项确认</button>
+    </div>
+	
+	<div class="blank">
+    	<br>
+    </div>
+	
+	<div id="set-h3">
+		<input type="text" name="global-h3-font-size" class="global-h3-font-size" placeholder="全局h3字体大小"/>
+		<button class="global-h3-font-size-submit">h3字体大小确认</button>
+		<input type="text" name="global-h3-line-height" class="global-h3-line-height" placeholder="全局h3行高"/>
+		<button class="global-h3-line-height-submit">h3行高确认</button>
+		<select name="global-h3-font-weight" class="global-h3-font-weight">
+		  <option value="normal" selected>normal</option>
+		  <option value="bold">bold</option>
+    	  <option value="lighter">lighter</option>
+		  <option value="bolder">bolder</option>
+  	  	</select>
+		<button class="global-h3-font-weight-submit">h3字体粗细确认</button>
+		<input type="text" name="global-h3-color" class="global-h3-color" placeholder="全局h3字体颜色"/>
+		<button class="global-h3-color-submit">h3字体颜色确认</button>
+	</div>
+	
+	<div class="blank">
+    	<br>
+    </div>
+	
+	<div id="set-p">
+		<input type="text" name="global-p-font-size" class="global-p-font-size" placeholder="全局p字体大小"/>
+		<button class="global-p-font-size-submit">p字体大小确认</button>
+		<input type="text" name="global-p-line-height" class="global-p-line-height" placeholder="全局p行高"/>
+		<button class="global-p-line-height-submit">p行高确认</button>
+		<select name="global-p-font-weight" class="global-p-font-weight">
+    	  <option value="normal" selected>normal</option>
+		  <option value="bold">bold</option>
+    	  <option value="lighter">lighter</option>
+		  <option value="bolder">bolder</option>
+  	  	</select>
+		<button class="global-p-font-weight-submit">p字体粗细确认</button>
+		<input type="text" name="global-p-color" class="global-p-color" placeholder="全局p字体颜色"/>
+		<button class="global-p-color-submit">p字体颜色确认</button>
+	</div>
+    
+    <div id="append-new">
+		<button class="add">add</button>
+	</div>
+
+    <div id="add-hr-vertical">
+    	<button class="add-vhr">添加垂直参考线</button>
+    </div>
+	
+    <div class="blank">
+    	<br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+    
+    <div id="commit">
+      <button class="end">end</button>
+    </div>
+	
+    
+</body>
+</html>
+

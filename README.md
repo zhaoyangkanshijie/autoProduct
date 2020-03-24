@@ -15,6 +15,8 @@ version4用于引入思源黑体，无需思源的，可用version3的微软雅�
 
 version5为特殊版本，把version4的字体文件放到images文件夹里，另外为兼容老版富文本编辑器bug，换行替换为```<font style="font-family: Microsoft YaHei"><br /></font>```。
 
+version6在version5的基础上，增加思源黑体多种ttf的选择。包括Bold、ExtraLight、Light、Medium、Normal、Regular。
+
 ## 界面
 
 1. 随意修改文字大小行高，且随意拖动，修改样式和布局方便
@@ -39,7 +41,8 @@ version5为特殊版本，把version4的字体文件放到images文件夹里，�
     3. input：输入中间td宽度
     4. input：不使用宽度auto时，两边td宽度
     5. input：table宽度
-    6. input：确认以上设置
+	6. select-option：选择字体
+    7. input：确认以上设置
 
 * 无bug配置(其余尺寸待测)
     1. 1200+360 no-auto
