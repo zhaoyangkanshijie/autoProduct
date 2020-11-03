@@ -1,0 +1,732 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>专题制作插件</title>
+	<link rel="stylesheet" href="./js/jquery-ui.min.css">
+
+	<script src="./js/jquery.min.js"></script>
+	<script src="./js/jquery-ui.min.js"></script>
+	<script src="./js/jquery.colorpicker.js"></script>
+	<script src="./js/jquery.mousewheel.js"></script>
+
+</head>
+
+<script>
+	var productNameSubmit = "";//确认的产品型号
+	var UIWidthSubmit = 1920;//确认设计稿宽度
+	var fontFamilySubmit = "";//确认的字体
+	var alreadyCommit = 0;//确认选项
+
+	var titleStandard = {
+		fontSize: 50,
+		lineHeight: 60,
+		color: "ffffff"
+	};//标题标准
+	var contentStandard = {
+		fontSize: 24,
+		lineHeight: 34,
+		color: "000000"
+	};//正文标准
+
+
+	var globalColor = new Array();//用于记录颜色
+
+	var addNumber = 0;//版块数量
+
+	var keyCode = {
+		up: 38,
+		down: 40,
+		left: 37,
+		right: 39,
+		a: 65,
+		b: 66,
+		c: 67,
+		d: 68,
+		e: 69,
+		f: 70,
+		g: 71,
+		h: 72,
+		i: 73,
+		j: 74,
+		k: 75,
+		l: 76,
+		m: 77,
+		n: 78,
+		o: 79,
+		p: 80,
+		q: 81,
+		r: 82,
+		s: 83,
+		t: 84,
+		u: 85,
+		v: 86,
+		w: 87,
+		x: 88,
+		y: 89,
+		z: 90
+	};//键盘编码
+
+	//初始化提交值
+	var init = function () {
+		console.log("initial");
+		productNameSubmit = "";
+		UIWidthSubmit = 1920;
+		fontFamilySubmit = "";
+		alreadyCommit = 0;
+	}
+
+	//校验数据
+	var validateData = function (productName, uiWidth, fontFamily) {
+		console.log("validate");
+		if (productName == "") {
+			alert("产品型号(英文)");
+			return false;
+		}
+		if (uiWidth < 0) {
+			alert("设计稿宽度");
+			return false;
+		}
+		if (fontFamily == "选择字体") {
+			alert("选择字体");
+			return false;
+		}
+		return true;
+	}
+
+	//提交参数
+	var submitValue = function (productName, uiWidth, fontFamily) {
+		console.log("submit");
+		$(document).attr("title", productName);
+		productNameSubmit = productName;
+		UIWidthSubmit = uiWidth;
+		fontFamilySubmit = fontFamily;
+		alreadyCommit = 1;
+	}
+
+	//版面处理
+	var modifyTable = function () {
+		console.log("modifyTable");
+		if (addNumber > 0) {
+			//div处理
+			$("div").eq(2).attr("id", productNameSubmit + "-main");
+			$("#" + productNameSubmit + "-main").css({
+				"width": "100%",
+				"fontFamily": "SourceHanSansCN-" + fontFamilySubmit + ", Microsoft YaHei, Arial;"
+			});
+		}
+	}
+
+	//添加div
+	var addDiv = function () {
+		$("#append-new").before(
+			'<div id="' + productNameSubmit + '-main">' + '</div>'
+		);
+		$("#" + productNameSubmit + "-main").append(
+			`<style>
+				@font-face {
+					font-family: 'SourceHanSansCN-`+ fontFamilySubmit + `';
+					src: url('images/SourceHanSansCN-`+ fontFamilySubmit + `.eot');
+					src:
+						url('images/SourceHanSansCN-`+ fontFamilySubmit + `.eot?#font-spider') format('embedded-opentype'),
+						url('images/SourceHanSansCN-`+ fontFamilySubmit + `.woff') format('woff'),
+						url('images/SourceHanSansCN-`+ fontFamilySubmit + `.ttf') format('truetype'),
+						url('images/SourceHanSansCN-`+ fontFamilySubmit + `.svg') format('svg');
+					font-weight: normal;
+					font-style: normal;
+				}
+			</style>`
+		);
+		$("#" + productNameSubmit + "-main").css({
+			"width": "100%",
+			"fontFamily": "SourceHanSansCN-" + fontFamilySubmit + ", Microsoft YaHei, Arial"
+		});
+	}
+	
+	//加入一块内容
+	var addContent = function () {
+		addNumber++;
+		console.log('addNumber:' + addNumber);
+		//第一次插入外层div
+		if (addNumber == 1) {
+			addDiv();
+		}
+		//插入版块内容
+		addTable();
+	}
+
+	//插入table
+	var addTable = function () {
+		//插入table
+		if (addNumber < 10) {
+			addTable19();
+		}
+		else {
+			addTable10();
+		}
+	}
+
+	//添加table，图片数1-9
+	var addTable19 = function () {
+		$("#" + productNameSubmit + "-main").append(
+			`<div style="width:100%;position:relative;">
+				<img style="width:100%;display:block;" src="images/${productNameSubmit}_0${addNumber}.jpg"> 
+			</div>`
+		);
+	}
+
+	//添加table，图片数10+
+	var addTable10 = function () {
+		$("#" + productNameSubmit + "-main").append(
+			`<div style="width:100%;position:relative;">
+				<img style="width:100%;display:block;" src="images/${productNameSubmit}_${addNumber}.jpg"> 
+			</div>`
+		);
+	}
+
+	//添加控制器
+	var addController = function () {
+		addControllerFace();
+		addControllerEvent();
+	}
+
+	//table后添加控制界面
+	var addControllerFace = function () {
+		$("#" + productNameSubmit + "-main").children("div").eq(addNumber - 1).append(
+			'<div class="helper" style="position:absolute;top:0px;left:0px;width:300px;font-family:Microsoft YaHei">'
+			+ '<button class="show-hidden-ctrl" onclick="$(this).parent().find(\'div\').slideToggle(\'slow\')">显示/隐藏控件</button>'
+				+ '<div class="table-helper">'
+					+ '<button class="hints-dark" style="margin-right: 9px;" onclick="$(this).parent().css(\'color\',\'#000000\')">提示文字变深色</button>'
+					+ '<button class="hints-light" onclick="$(this).parent().css(\'color\',\'#ffffff\')">提示文字变浅色</button>'
+					+ '<br/>'
+					+ '<button class="addp">addp</button>'
+					+ '<br/>'
+					+ '<button class="remove-p" style="margin-right: 27px;">remove-p</button>'
+					+ '<button class="remove-table">remove-table</button>'
+					+ '<textarea class="global-color" style="margin: 0px;height: 60px;width: 285px;"></textarea>'
+				+ '</div>'
+			+ '</div>'
+		);
+	}
+
+	//注册控制器监听事件
+	var addControllerEvent = function () {
+		$(".helper .table-helper").children().unbind();
+		addP();
+		removeP();
+		removeTable();
+		initialGlobalColor();
+	}
+
+	//插入<p>
+	var addP = function () {
+		$(".helper .addp").each(function (index, element) {
+			$(this).on("click", function () {
+				console.log("index:" + index);
+				console.log("add <p>");
+				var pLength = $("#" + productNameSubmit + "-main").children("div").eq(index).children('p').length;
+				if(pLength == 0){
+					$("#" + productNameSubmit + "-main").children("div").eq(index).append(
+						`<p style="position:absolute;top:10%;left:50%;font-size:${(titleStandard.fontSize/(UIWidthSubmit/100)).toFixed(5)}vw;line-height:${(titleStandard.lineHeight/titleStandard.fontSize).toFixed(5)}em;color:#${titleStandard.color};" class="pdraggable" data-font-size="${titleStandard.fontSize}" data-line-height="${titleStandard.lineHeight}">此处为标题</p>`
+					);
+				}
+				else{
+					$("#" + productNameSubmit + "-main").children("div").eq(index).append(
+						`<p style="position:absolute;top:10%;left:50%;font-size:${(contentStandard.fontSize/(UIWidthSubmit/100)).toFixed(5)}vw;line-height:${(contentStandard.lineHeight/contentStandard.fontSize).toFixed(5)}em;color:#${contentStandard.color};" class="pdraggable" data-font-size="${titleStandard.fontSize}" data-line-height="${titleStandard.lineHeight}">此处为正文</p>`
+					);
+				}
+				$(".p-helper").children().unbind().remove();
+				$(".p-helper").remove();
+				$(".pcp").remove();
+				pHelper();
+			});
+		});
+	}
+
+	//<p>帮助模块
+	var pHelper = function(){
+		var ptableNum = -1;
+		var pNum = -1;
+		$(".pdraggable").on("click",function(){
+			console.log("p click");
+			console.log($(this));
+			var ptable = $(this).parent('div');
+			var ptableNumber = $("#" + productNameSubmit + "-main").children("div").index(ptable);
+			var pNumber = ptable.children("p").index($(this));
+			console.log('ptable:',ptable,'ptableNumber:'+ptableNumber,'pNumber:'+pNumber);
+			if(ptableNumber != ptableNum || pNumber != pNum)
+			{
+				console.log("not same");
+				removePHelper(ptableNum,pNum);
+				
+				ptableNum = ptableNumber;
+				pNum = pNumber;
+				
+				pModuleFunction(ptableNumber,pNumber);
+			}
+		});
+	}
+
+	//<p>功能模块
+	var pModuleFunction = function (ptableNumber, pNumber) {
+		addPControllerFace(ptableNumber, pNumber);
+		setPControllerFace(ptableNumber, pNumber);
+		pFontSizeSpinner(ptableNumber, pNumber);
+		pLineHeightSpinner(ptableNumber, pNumber);
+		pColor(ptableNumber, pNumber);
+		pColorMore(ptableNumber, pNumber);
+		pAlign(ptableNumber, pNumber);
+		pResetPosition(ptableNumber, pNumber);
+		pTextarea(ptableNumber, pNumber);
+		pDirection(ptableNumber, pNumber);
+	}
+
+	//去掉p控件
+	var removePHelper = function (ptableNum, pNum) {
+		if ($(".p-helper" + ptableNum + "-" + pNum) != null) {
+			console.log("removePHelper");
+			$(".p-helper" + ptableNum + "-" + pNum).children().unbind().remove();
+			$(".p-helper" + ptableNum + "-" + pNum).remove();
+		}
+		$(".pcp").remove();
+	}
+
+	//增加p控制界面
+	var addPControllerFace = function (ptableNumber, pNumber) {
+		console.log("addPControllerFace");
+		$(".helper").eq(ptableNumber).find("div").eq(0).append(
+			'<div class="p-helper' + ptableNumber + '-' + pNumber + ' p-helper' + '" style="width:300px;">'
+			+ '<p style="margin:0;">当前p-文字大小/行高:</p>'
+			+ '<input type="text" class="p-font-size-spinner" name="p-font-size-spinner" placeholder="p-font-size-spinner">'
+			+ '<input type="text" class="p-line-height-spinner" name="p-line-height-spinner" placeholder="p-line-height-spinner">'
+			+ '<br/>'
+			+ '<input type="text" name="p-color" class="p-color" style="width:100px;margin-right:15px;" placeholder="点击选择颜色"/>'
+			+ '<input type="text" name="p-color-more" class="p-color-more" style="width:100px;" placeholder="输入更多颜色"/>'
+			+ '<br/>'
+			+ '<select class="p-align" style="margin-right:57px;">'
+			+ '<option value="center">center</option>'
+			+ '<option value="left">left</option>'
+			+ '<option value="right">right</option>'
+			+ '</select>'
+			+ '<button class="p-reset-position">reset-position</button>'
+			+ '<br/>'
+			+ '<textarea class="p-textarea" style="height:150px;width:250px;" placeholder="p输入内容">p输入内容</textarea>'
+			+ '<input type="text" name="p-direction" class="p-direction" style="width:250px;" placeholder="awds,fthg,jilk控制方向"/>'
+			+ '</div>'
+		);
+	}
+
+	//设置p控制界面
+	var setPControllerFace = function (ptableNumber, pNumber) {
+		if(pNumber == 0){
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner();
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner("value", titleStandard.fontSize);
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner();
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner("value", titleStandard.lineHeight);
+		}
+		else{
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner();
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner("value", contentStandard.fontSize);
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner();
+			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner("value", contentStandard.lineHeight);
+		}
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-textarea").html($("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).html());
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").css("width", "50px");
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").css("width", "50px");
+		$(".p-helper" + ptableNumber + "-" + pNumber).find("span").eq(0).css("margin-right", "39px");
+	}
+
+	//spinner改变p字体大小
+	var pFontSizeSpinner = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner({
+			min: 10,
+			max: 150,
+			spin: function (event, ui) {
+				console.log("spinner-font-size:" + ui.value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size", ui.value);
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("font-size", (ui.value/(UIWidthSubmit/100)).toFixed(5) + "vw");
+				var lineHeight = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height");
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (lineHeight/ui.value).toFixed(5) + "em");
+			}
+		});
+	}
+
+	//改变p字体大小
+	var pFontSize = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size").bind('input propertychange', function () {
+			var value = parseInt($(this).val());
+			console.log("font-size:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if (isNaN(value)) {
+				value = 10;
+			}
+			else if (value < 10 || value > 80) {
+				value = 10;
+			}
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size", value);
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("font-size", (value/(UIWidthSubmit/100)).toFixed(5) + "vw");
+			var lineHeight = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height");
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (lineHeight/ui.value).toFixed(5) + "em");
+		});
+	}
+
+	//spinner改变p行高
+	var pLineHeightSpinner = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner({
+			min: 10,
+			max: 150,
+			spin: function (event, ui) {
+				console.log("spinner-line-height:" + ui.value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height", ui.value);
+				var fontSize = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size");
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (ui.value/fontSize).toFixed(5) + "em");
+			}
+		});
+	}
+
+	//改变p行高
+	var pLineHeight = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height").bind('input propertychange', function () {
+			var value = parseInt($(this).val());
+			console.log("line-height:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if (isNaN(value)) {
+				value = 20;
+			}
+			else if (value < 20 || value > 150) {
+				value = 20;
+			}
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height", value);
+				var fontSize = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size");
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (value/fontSize).toFixed(5) + "em");
+		});
+	}
+
+	//改变p颜色
+	var pColor = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color").colorpicker({
+			fillcolor: true,
+			event: 'click',
+			target: $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber),
+			success: function (o, color) {
+				$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color").val(color)
+			}
+		});
+		$(".colorpanel").each(function (index, element) {
+			if ($(".colorpanel").eq(index).attr("class").indexOf("h3cp") == -1) {
+				$(".colorpanel").eq(index).addClass("pcp");
+			}
+		});
+	}
+
+	//输入更多p颜色
+	var pColorMore = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-color-more").bind('click', function () {
+			var value = $(this).val();
+			var reg = /^[0-9a-f]{6}$/;
+			console.log("color:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			if (reg.test(value)) {
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("color", "#" + value);
+				if ($.inArray(value, globalColor) < 0) {
+					globalColor.push(value);
+					initialGlobalColor();
+				}
+			}
+			else {
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("color", "#0000ff");
+			}
+		});
+	}
+
+	//改变p align
+	var pAlign = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-align").on("change", function () {
+			var value = $(this).children("option:selected").val();
+			console.log("align:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).attr("align", value);
+		});
+	}
+
+	//重置p位置
+	var pResetPosition = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-reset-position").on("click", function () {
+			console.log("reset p position," + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber)
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css({
+				"left": "50%",
+				"top": "10%"
+			});
+		});
+	}
+
+	//输入p内容
+	var pTextarea = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-textarea").bind('input propertychange', function () {
+			var value = $(this).val().replace(/ /g, "&nbsp;").replace(/\n/g, '<font style="font-family: Arial"><br /></font>');
+			console.log("textarea:" + value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).html(value);
+			if (value.length == 0) {
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).html("p待输入内容");
+			}
+		});
+	}
+
+	//控制p移动
+	var pDirection = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-direction").bind('keydown', function (e) {
+			var top = parseFloat($("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).get(0).style.top);
+			var left = parseFloat($("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).get(0).style.left);
+			
+			console.log(e)
+			console.log(`move begin:keyCode:${e.keyCode},table:${ptableNumber},p:${pNumber},top:${top},left:${left}`)
+
+			if(e.keyCode == keyCode.a){
+				if(left>=10){
+					left -= 10;
+				}
+			}
+			if(e.keyCode == keyCode.w){
+				if(top<=90){
+					top += 10;
+				}
+			}
+			if(e.keyCode == keyCode.d){
+				if(left<=90){
+					left += 10;
+				}
+			}
+			if(e.keyCode == keyCode.s){
+				if(top>=10){
+					top -= 10;
+				}
+			}
+
+			if(e.keyCode == keyCode.f){
+				if(left>=1){
+					left -= 1;
+				}
+			}
+			if(e.keyCode == keyCode.t){
+				if(top<=99){
+					top += 1;
+				}
+			}
+			if(e.keyCode == keyCode.h){
+				if(left<=99){
+					left += 1;
+				}
+			}
+			if(e.keyCode == keyCode.g){
+				if(top>=1){
+					top -= 1;
+				}
+			}
+
+			if(e.keyCode == keyCode.j){
+				if(left>=0.1){
+					left -= 0.1;
+				}
+			}
+			if(e.keyCode == keyCode.i){
+				if(top<=99.9){
+					top += 0.1;
+				}
+			}
+			if(e.keyCode == keyCode.l){
+				if(left<=99.9){
+					left += 0.1;
+				}
+			}
+			if(e.keyCode == keyCode.k){
+				if(top>=0.1){
+					top -= 0.1;
+				}
+			}
+
+			if(e.keyCode == keyCode.left){
+				if(left>=0.01){
+					left -= 0.01;
+				}
+			}
+			if(e.keyCode == keyCode.up){
+				if(top<=99.99){
+					top += 0.01;
+				}
+			}
+			if(e.keyCode == keyCode.right){
+				if(left<=99.99){
+					left += 0.01;
+				}
+			}
+			if(e.keyCode == keyCode.down){
+				if(top>=0.01){
+					top -= 0.01;
+				}
+			}
+
+			console.log(`move end:top:${top},left:${left}`)
+
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("top", top.toFixed(2)+"%");
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("left", left.toFixed(2)+"%");
+			$(this).val("");
+		});
+	}
+
+	//移除<p>
+	var removeP = function(){
+		$(".helper .remove-p").each(function(index, element){
+			$(this).on("click",function(){
+				console.log("index:"+index);
+				console.log("remove <p>");
+				$("#" + productNameSubmit + "-main").children("div").eq(index).children('p').unbind().remove();
+			});
+		});
+	}
+
+	//移除table
+	var removeTable = function () {
+		$(".helper .remove-table").each(function (index, element) {
+			console.log("11111");
+			console.log($(this));
+			$(this).on("click", function () {
+				console.log("22222");
+				console.log($(this));
+				console.log("index:" + index);
+				console.log("remove table");
+				$(this).parent().parent('.helper').parent('div').remove();
+				addNumber--;
+				console.log('addNumber:' + addNumber);
+				if (addNumber == 0) {
+					$("#" + productNameSubmit + "-main").remove();
+				}
+			});
+		});
+	}
+
+	//显示全局颜色到textarea
+	var initialGlobalColor = function () {
+		var colorStr = "";
+		for (var i = 0; i < globalColor.length; i++) {
+			colorStr += globalColor[i];
+			colorStr += "/";
+		}
+		$(".global-color").val(colorStr);
+	}
+
+
+	$(function () {
+		//“选项确认”点击
+		$("#set-option .option-submit").on("click", function () {
+			//获取输入的数据
+			var productName = $("#set-option .product-name").val();
+			var uiWidth = $("#set-option .ui-width").val();
+			var fontFamily = $("#set-option .font-family option:selected").val();
+
+			init();
+			var judge = validateData(productName, uiWidth, fontFamily);
+			if (judge) {
+				submitValue(productName, uiWidth, fontFamily);
+				modifyTable();
+			}
+		});
+
+		//标题标准确认
+		$("#font-standard .title .submit").on("click", function () {
+			console.log("标题标准确认")
+			titleStandard.fontSize = isNaN(parseInt($("#font-standard .title .font-size").val())) ? 16 : parseInt($("#font-standard .title .font-size").val());
+			titleStandard.lineHeight = isNaN(parseInt($("#font-standard .title .line-height").val())) ? 26 : parseInt($("#font-standard .title .line-height").val());
+			titleStandard.color = $("#font-standard .title .color").val() == "" ? "ff0000" : $("#font-standard .title .color").val();
+			console.log(titleStandard)
+		});
+
+		//正文标准确认
+		$("#font-standard .content .submit").on("click", function () {
+			console.log("正文标准确认")
+			contentStandard.fontSize = isNaN(parseInt($("#font-standard .content .font-size").val())) ? 16 : parseInt($("#font-standard .content .font-size").val());
+			contentStandard.lineHeight = isNaN(parseInt($("#font-standard .content .line-height").val())) ? 26 : parseInt($("#font-standard .content .line-height").val());
+			contentStandard.color = $("#font-standard .content .color").val() == "" ? "ff0000" : $("#font-standard .content .color").val();
+			console.log(contentStandard)
+		});
+
+		//“add”点击
+		$("#append-new .add").on("click", function () {
+			if (alreadyCommit == 0) {
+				alert("选项确认");
+			}
+			else {
+				//添加table内容
+				addContent();
+				//插入可视化控制器
+				addController();
+			}
+		});
+		//“end”点击
+		$("#commit .end").on("click", function () {
+			$(".pdraggable").unbind().removeAttr("class").removeData("font-size").removeData("line-height");
+			$(".colorpanel").unbind().remove();
+			$("#font-standard .title .submit,#font-standard .content .submit").unbind().remove();
+			$("#set-option,#append-new,#commit,#font-standard,.helper,script,.blank").remove();
+			$("link").eq(0).remove();
+		});
+	});
+</script>
+
+<body style="padding:0;margin:0;">
+	<div id="set-option">
+		<input type="text" name="product-name" class="product-name" placeholder="产品型号(英文)" />
+		<input type="number" name="ui-width" class="ui-width" placeholder="设计稿宽度" step="1" min="1200" value="1920" />
+		<select name="select2" class="font-family">
+			<option value="选择字体">选择字体</option>
+			<option value="Bold">Bold</option>
+			<option value="ExtraLight">ExtraLight</option>
+			<option value="Light">Light</option>
+			<option value="Medium">Medium</option>
+			<option value="Normal">Normal</option>
+			<option value="Regular">Regular</option>
+		</select>
+		<button class="option-submit">选项确认</button>
+	</div>
+
+	<div class="blank">
+		<br>
+	</div>
+
+	<div id="font-standard">
+		<div class="title">
+			<span class="name">应用标题格式:</span>
+			<input class="font-size" type="text" placeholder="字体大小px" />
+			<input class="line-height" type="text" placeholder="行高px" />
+			<input class="color" type="text" placeholder="颜色" />
+			<button class="submit">确认</button>
+		</div>
+		<br>
+		<div class="content">
+			<span class="name">应用正文格式:</span>
+			<input class="font-size" type="text" placeholder="字体大小px" />
+			<input class="line-height" type="text" placeholder="行高px" />
+			<input class="color" type="text" placeholder="颜色" />
+			<button class="submit">确认</button>
+		</div>
+	</div>
+
+	<div id="append-new">
+		<button class="add">add</button>
+	</div>
+
+	<div class="blank">
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+	</div>
+
+	<div id="commit">
+		<button class="end">end</button>
+	</div>
+
+
+</body>
+
+</html>
