@@ -484,8 +484,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.w){
-				if(top<=90){
-					top += 10;
+				if(top>=10){
+					top -= 10;
 				}
 			}
 			if(e.keyCode == keyCode.d){
@@ -494,8 +494,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.s){
-				if(top>=10){
-					top -= 10;
+				if(top<=90){
+					top += 10;
 				}
 			}
 
@@ -505,8 +505,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.t){
-				if(top<=99){
-					top += 1;
+				if(top>=1){
+					top -= 1;
 				}
 			}
 			if(e.keyCode == keyCode.h){
@@ -515,8 +515,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.g){
-				if(top>=1){
-					top -= 1;
+				if(top<=99){
+					top += 1;
 				}
 			}
 
@@ -526,8 +526,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.i){
-				if(top<=99.9){
-					top += 0.1;
+				if(top>=0.1){
+					top -= 0.1;
 				}
 			}
 			if(e.keyCode == keyCode.l){
@@ -536,8 +536,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.k){
-				if(top>=0.1){
-					top -= 0.1;
+				if(top<=99.9){
+					top += 0.1;
 				}
 			}
 
@@ -547,8 +547,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.up){
-				if(top<=99.99){
-					top += 0.01;
+				if(top>=0.01){
+					top -= 0.01;
 				}
 			}
 			if(e.keyCode == keyCode.right){
@@ -557,8 +557,8 @@
 				}
 			}
 			if(e.keyCode == keyCode.down){
-				if(top>=0.01){
-					top -= 0.01;
+				if(top<=99.99){
+					top += 0.01;
 				}
 			}
 
@@ -646,6 +646,24 @@
 			console.log(contentStandard)
 		});
 
+		//仅有正文格式确认
+		$("#font-standard .content .submit2").on("click", function () {
+			console.log("仅有正文格式确认")
+			contentStandard.fontSize = isNaN(parseInt($("#font-standard .content .font-size").val())) ? 16 : parseInt($("#font-standard .content .font-size").val());
+			contentStandard.lineHeight = isNaN(parseInt($("#font-standard .content .line-height").val())) ? 26 : parseInt($("#font-standard .content .line-height").val());
+			contentStandard.color = $("#font-standard .content .color").val() == "" ? "ff0000" : $("#font-standard .content .color").val();
+			titleStandard.fontSize = contentStandard.fontSize;
+			titleStandard.lineHeight = contentStandard.lineHeight;
+			titleStandard.color = contentStandard.color;
+			$("#font-standard .title .font-size").val(contentStandard.fontSize)
+			$("#font-standard .title .line-height").val(contentStandard.lineHeight)
+			$("#font-standard .title .color").val(contentStandard.color)
+			$("#font-standard .content .font-size").val(contentStandard.fontSize)
+			$("#font-standard .content .line-height").val(contentStandard.lineHeight)
+			$("#font-standard .content .color").val(contentStandard.color)
+			console.log(contentStandard)
+		});
+
 		//“add”点击
 		$("#append-new .add").on("click", function () {
 			if (alreadyCommit == 0) {
@@ -694,7 +712,7 @@
 			<span class="name">应用标题格式:</span>
 			<input class="font-size" type="text" placeholder="字体大小px" />
 			<input class="line-height" type="text" placeholder="行高px" />
-			<input class="color" type="text" placeholder="颜色" />
+			<input class="color" type="text" placeholder="颜色" minlength="6" maxlength="6" />
 			<button class="submit">确认</button>
 		</div>
 		<br>
@@ -702,8 +720,9 @@
 			<span class="name">应用正文格式:</span>
 			<input class="font-size" type="text" placeholder="字体大小px" />
 			<input class="line-height" type="text" placeholder="行高px" />
-			<input class="color" type="text" placeholder="颜色" />
+			<input class="color" type="text" placeholder="颜色" minlength="6" maxlength="6" />
 			<button class="submit">确认</button>
+			<button class="submit2">仅有正文格式</button>
 		</div>
 	</div>
 
