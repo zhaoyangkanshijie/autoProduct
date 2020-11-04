@@ -22,12 +22,12 @@
 	var titleStandard = {
 		fontSize: 50,
 		lineHeight: 60,
-		color: "ffffff"
+		color: "0000ff"
 	};//标题标准
 	var contentStandard = {
 		fontSize: 24,
 		lineHeight: 34,
-		color: "000000"
+		color: "0000ff"
 	};//正文标准
 
 
@@ -678,7 +678,7 @@
 		});
 		//“end”点击
 		$("#commit .end").on("click", function () {
-			$(".pdraggable").unbind().removeAttr("class").removeData("font-size").removeData("line-height");
+			$(".pdraggable").unbind().removeAttr("class").removeAttr("data-font-size").removeAttr("data-line-height");
 			$(".colorpanel").unbind().remove();
 			$("#font-standard .title .submit,#font-standard .content .submit").unbind().remove();
 			$("#set-option,#append-new,#commit,#font-standard,.helper,script,.blank").remove();
