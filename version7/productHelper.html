@@ -19,17 +19,24 @@
 	var fontFamilySubmit = "";//确认的字体
 	var alreadyCommit = 0;//确认选项
 
-	var titleStandard = {
-		fontSize: 50,
-		lineHeight: 60,
-		color: "0000ff"
-	};//标题标准
-	var contentStandard = {
-		fontSize: 24,
-		lineHeight: 34,
-		color: "0000ff"
-	};//正文标准
-
+	var standard = [
+		{
+			fontSize: 50,
+			lineHeight: 60,
+			color: "0000ff"
+		},
+		{
+			fontSize: 30,
+			lineHeight: 40,
+			color: "0000ff"
+		},
+		{
+			fontSize: 20,
+			lineHeight: 30,
+			color: "0000ff"
+		}
+	];//预设标准
+	var standardActive = 0;
 
 	var globalColor = new Array();//用于记录颜色
 
@@ -200,7 +207,10 @@
 					+ '<button class="hints-dark" style="margin-right: 9px;" onclick="$(this).parent().css(\'color\',\'#000000\')">提示文字变深色</button>'
 					+ '<button class="hints-light" onclick="$(this).parent().css(\'color\',\'#ffffff\')">提示文字变浅色</button>'
 					+ '<br/>'
-					+ '<button class="addp">addp</button>'
+					+ '<button style="margin-right: 5px;" class="addp">addp</button>'
+					+ '<button style="margin-right: 5px;" class="useStandard1">使用格式1</button>'
+					+ '<button style="margin-right: 5px;" class="useStandard2">使用格式2</button>'
+					+ '<button class="useStandard3">使用格式3</button>'
 					+ '<br/>'
 					+ '<button class="remove-p" style="margin-right: 27px;">remove-p</button>'
 					+ '<button class="remove-table">remove-table</button>'
@@ -214,6 +224,7 @@
 	var addControllerEvent = function () {
 		$(".helper .table-helper").children().unbind();
 		addP();
+		useStandard();
 		removeP();
 		removeTable();
 		initialGlobalColor();
@@ -226,16 +237,9 @@
 				console.log("index:" + index);
 				console.log("add <p>");
 				var pLength = $("#" + productNameSubmit + "-main").children("div").eq(index).children('p').length;
-				if(pLength == 0){
-					$("#" + productNameSubmit + "-main").children("div").eq(index).append(
-						`<p style="position:absolute;top:10%;left:50%;font-size:${(titleStandard.fontSize/(UIWidthSubmit/100)).toFixed(5)}vw;line-height:${(titleStandard.lineHeight/titleStandard.fontSize).toFixed(5)}em;color:#${titleStandard.color};" class="pdraggable" data-font-size="${titleStandard.fontSize}" data-line-height="${titleStandard.lineHeight}">此处为标题</p>`
-					);
-				}
-				else{
-					$("#" + productNameSubmit + "-main").children("div").eq(index).append(
-						`<p style="position:absolute;top:10%;left:50%;font-size:${(contentStandard.fontSize/(UIWidthSubmit/100)).toFixed(5)}vw;line-height:${(contentStandard.lineHeight/contentStandard.fontSize).toFixed(5)}em;color:#${contentStandard.color};" class="pdraggable" data-font-size="${titleStandard.fontSize}" data-line-height="${titleStandard.lineHeight}">此处为正文</p>`
-					);
-				}
+				$("#" + productNameSubmit + "-main").children("div").eq(index).append(
+					`<p style="margin:0;position:absolute;top:10%;left:50%;font-size:${(standard[standardActive].fontSize/(UIWidthSubmit/100)).toFixed(5)}vw;line-height:${(standard[standardActive].lineHeight/standard[standardActive].fontSize).toFixed(5)}em;color:#${standard[standardActive].color};" class="pdraggable" data-font-size="${standard[standardActive].fontSize}" data-line-height="${standard[standardActive].lineHeight}">此处为文字</p>`
+				);
 				$(".p-helper").children().unbind().remove();
 				$(".p-helper").remove();
 				$(".pcp").remove();
@@ -246,8 +250,6 @@
 
 	//<p>帮助模块
 	var pHelper = function(){
-		var ptableNum = -1;
-		var pNum = -1;
 		$(".pdraggable").on("click",function(){
 			console.log("p click");
 			console.log($(this));
@@ -255,16 +257,9 @@
 			var ptableNumber = $("#" + productNameSubmit + "-main").children("div").index(ptable);
 			var pNumber = ptable.children("p").index($(this));
 			console.log('ptable:',ptable,'ptableNumber:'+ptableNumber,'pNumber:'+pNumber);
-			if(ptableNumber != ptableNum || pNumber != pNum)
-			{
-				console.log("not same");
-				removePHelper(ptableNum,pNum);
-				
-				ptableNum = ptableNumber;
-				pNum = pNumber;
-				
-				pModuleFunction(ptableNumber,pNumber);
-			}
+
+			removePHelper();
+			pModuleFunction(ptableNumber,pNumber);
 		});
 	}
 
@@ -280,15 +275,13 @@
 		pResetPosition(ptableNumber, pNumber);
 		pTextarea(ptableNumber, pNumber);
 		pDirection(ptableNumber, pNumber);
+		pDirectionFocus(ptableNumber, pNumber);
 	}
 
 	//去掉p控件
-	var removePHelper = function (ptableNum, pNum) {
-		if ($(".p-helper" + ptableNum + "-" + pNum) != null) {
-			console.log("removePHelper");
-			$(".p-helper" + ptableNum + "-" + pNum).children().unbind().remove();
-			$(".p-helper" + ptableNum + "-" + pNum).remove();
-		}
+	var removePHelper = function () {
+		$(".p-helper").children().unbind().remove();
+		$(".p-helper").remove();
 		$(".pcp").remove();
 	}
 
@@ -319,18 +312,10 @@
 
 	//设置p控制界面
 	var setPControllerFace = function (ptableNumber, pNumber) {
-		if(pNumber == 0){
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner();
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner("value", titleStandard.fontSize);
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner();
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner("value", titleStandard.lineHeight);
-		}
-		else{
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner();
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner("value", contentStandard.fontSize);
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner();
-			$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner("value", contentStandard.lineHeight);
-		}
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner();
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").spinner("value", $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size"));
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner();
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").spinner("value", $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height"));
 		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-textarea").html($("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).html());
 		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-font-size-spinner").css("width", "50px");
 		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-line-height-spinner").css("width", "50px");
@@ -345,6 +330,7 @@
 			spin: function (event, ui) {
 				console.log("spinner-font-size:" + ui.value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
 				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size", ui.value);
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).attr("data-font-size", ui.value);
 				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("font-size", (ui.value/(UIWidthSubmit/100)).toFixed(5) + "vw");
 				var lineHeight = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height");
 				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (lineHeight/ui.value).toFixed(5) + "em");
@@ -364,9 +350,10 @@
 				value = 10;
 			}
 			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size", value);
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).attr("data-font-size", value);
 			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("font-size", (value/(UIWidthSubmit/100)).toFixed(5) + "vw");
 			var lineHeight = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height");
-				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (lineHeight/ui.value).toFixed(5) + "em");
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (lineHeight/ui.value).toFixed(5) + "em");
 		});
 	}
 
@@ -378,6 +365,7 @@
 			spin: function (event, ui) {
 				console.log("spinner-line-height:" + ui.value + " ptableNumber:" + ptableNumber + " pNumber:" + pNumber);
 				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height", ui.value);
+				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).attr("data-line-height", ui.value);
 				var fontSize = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size");
 				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (ui.value/fontSize).toFixed(5) + "em");
 			}
@@ -396,8 +384,9 @@
 				value = 20;
 			}
 			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("line-height", value);
-				var fontSize = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size");
-				$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (value/fontSize).toFixed(5) + "em");
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).attr("data-line-height", value);
+			var fontSize = $("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).data("font-size");
+			$("#" + productNameSubmit + "-main").children("div").eq(ptableNumber).children("p").eq(pNumber).css("line-height", (value/fontSize).toFixed(5) + "em");
 		});
 	}
 
@@ -570,6 +559,37 @@
 		});
 	}
 
+	//p移动控件聚焦
+	var pDirectionFocus = function (ptableNumber, pNumber) {
+		$(".p-helper" + ptableNumber + "-" + pNumber).find(".p-direction").get(0).focus();
+		console.log('focus');
+	}
+
+	//使用标准按钮
+	var useStandard = function () {
+		$(".helper .useStandard1").each(function(index, element){
+			$(this).on("click",function(){
+				console.log("index:"+index);
+				console.log("useStandard1");
+				standardActive = 0;
+			});
+		});
+		$(".helper .useStandard2").each(function(index, element){
+			$(this).on("click",function(){
+				console.log("index:"+index);
+				console.log("useStandard2");
+				standardActive = 1;
+			});
+		});
+		$(".helper .useStandard3").each(function(index, element){
+			$(this).on("click",function(){
+				console.log("index:"+index);
+				console.log("useStandard3");
+				standardActive = 2;
+			});
+		});
+	}
+
 	//移除<p>
 	var removeP = function(){
 		$(".helper .remove-p").each(function(index, element){
@@ -628,40 +648,15 @@
 			}
 		});
 
-		//标题标准确认
-		$("#font-standard .title .submit").on("click", function () {
-			console.log("标题标准确认")
-			titleStandard.fontSize = isNaN(parseInt($("#font-standard .title .font-size").val())) ? 16 : parseInt($("#font-standard .title .font-size").val());
-			titleStandard.lineHeight = isNaN(parseInt($("#font-standard .title .line-height").val())) ? 26 : parseInt($("#font-standard .title .line-height").val());
-			titleStandard.color = $("#font-standard .title .color").val() == "" ? "ff0000" : $("#font-standard .title .color").val();
-			console.log(titleStandard)
-		});
-
-		//正文标准确认
-		$("#font-standard .content .submit").on("click", function () {
-			console.log("正文标准确认")
-			contentStandard.fontSize = isNaN(parseInt($("#font-standard .content .font-size").val())) ? 16 : parseInt($("#font-standard .content .font-size").val());
-			contentStandard.lineHeight = isNaN(parseInt($("#font-standard .content .line-height").val())) ? 26 : parseInt($("#font-standard .content .line-height").val());
-			contentStandard.color = $("#font-standard .content .color").val() == "" ? "ff0000" : $("#font-standard .content .color").val();
-			console.log(contentStandard)
-		});
-
-		//仅有正文格式确认
-		$("#font-standard .content .submit2").on("click", function () {
-			console.log("仅有正文格式确认")
-			contentStandard.fontSize = isNaN(parseInt($("#font-standard .content .font-size").val())) ? 16 : parseInt($("#font-standard .content .font-size").val());
-			contentStandard.lineHeight = isNaN(parseInt($("#font-standard .content .line-height").val())) ? 26 : parseInt($("#font-standard .content .line-height").val());
-			contentStandard.color = $("#font-standard .content .color").val() == "" ? "ff0000" : $("#font-standard .content .color").val();
-			titleStandard.fontSize = contentStandard.fontSize;
-			titleStandard.lineHeight = contentStandard.lineHeight;
-			titleStandard.color = contentStandard.color;
-			$("#font-standard .title .font-size").val(contentStandard.fontSize)
-			$("#font-standard .title .line-height").val(contentStandard.lineHeight)
-			$("#font-standard .title .color").val(contentStandard.color)
-			$("#font-standard .content .font-size").val(contentStandard.fontSize)
-			$("#font-standard .content .line-height").val(contentStandard.lineHeight)
-			$("#font-standard .content .color").val(contentStandard.color)
-			console.log(contentStandard)
+		//预设格式确认
+		$("#font-standard .standard .submit").on("click", function () {
+			console.log("预设格式确认")
+			var standardIndex = $("#font-standard .standard .submit").index($(this));
+			console.log("standardIndex",standardIndex)
+			standard[standardIndex].fontSize = parseInt($(this).parent('.standard').find('.font-size').val());
+			standard[standardIndex].lineHeight = parseInt($(this).parent('.standard').find('.line-height').val());
+			standard[standardIndex].color = $(this).parent('.standard').find('.color').val();
+			console.log(standard)
 		});
 
 		//“add”点击
@@ -708,21 +703,28 @@
 	</div>
 
 	<div id="font-standard">
-		<div class="title">
-			<span class="name">应用标题格式:</span>
-			<input class="font-size" type="text" placeholder="字体大小px" />
-			<input class="line-height" type="text" placeholder="行高px" />
-			<input class="color" type="text" placeholder="颜色" minlength="6" maxlength="6" />
+		<div class="standard">
+			<span class="name">预设格式1:</span>
+			<input class="font-size" type="number" step="1" placeholder="字体大小px" value="50" />
+			<input class="line-height" type="number" step="1" placeholder="行高px" value="60" />
+			<input class="color" type="text" placeholder="颜色" minlength="6" maxlength="6" value="0000ff" />
 			<button class="submit">确认</button>
 		</div>
 		<br>
-		<div class="content">
-			<span class="name">应用正文格式:</span>
-			<input class="font-size" type="text" placeholder="字体大小px" />
-			<input class="line-height" type="text" placeholder="行高px" />
-			<input class="color" type="text" placeholder="颜色" minlength="6" maxlength="6" />
+		<div class="standard">
+			<span class="name">预设格式2:</span>
+			<input class="font-size" type="number" step="1" placeholder="字体大小px" value="30" />
+			<input class="line-height" type="number" step="1" placeholder="行高px" value="40" />
+			<input class="color" type="text" placeholder="颜色" minlength="6" maxlength="6" value="0000ff" />
 			<button class="submit">确认</button>
-			<button class="submit2">仅有正文格式</button>
+		</div>
+		<br>
+		<div class="standard">
+			<span class="name">预设格式3:</span>
+			<input class="font-size" type="number" step="1" placeholder="字体大小px" value="20" />
+			<input class="line-height" type="number" step="1" placeholder="行高px" value="30" />
+			<input class="color" type="text" placeholder="颜色" minlength="6" maxlength="6" value="0000ff" />
+			<button class="submit">确认</button>
 		</div>
 	</div>
 

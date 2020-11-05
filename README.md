@@ -7,7 +7,7 @@
 3. 点击"add"添加，按提示操作table
 4. 稍微拖动文字，产生文字控件，按提示操作文字
 5. 点击结束，生成专题，Chrome检查，复制html下代码
-6. 把代码放到如Dreamweaver等工具，进行格式化
+6. 把代码放到如vscode等工具，进行格式化
 
 ## version7版本使用说明
 1. psd切图，图片命名为产品型号，如aaa_xx.jpg，放在与页面同目录的images文件夹里
@@ -15,7 +15,7 @@
 3. 点击"add"添加，按提示操作版块
 4. 点击文字，产生文字控件，按提示操作文字，注意文字位置通过input键盘事件移动，awds，fthg，jilk，上下左右方向键
 5. 点击结束，生成专题，Chrome检查，复制html下代码
-6. 把代码放到如Dreamweaver等工具，进行格式化
+6. 把代码放到如vscode等工具，进行格式化
 
 ## 最新说明
 
@@ -222,9 +222,9 @@ version7是响应式版本，删除version6中的hr，margin，h3，取消鼠标
 		* validateData(productName, uiWidth, fontFamily)
 	4. 提交临时数据到全局数据
 		* submitValue(productName, uiWidth, fontFamily)
-	5. 如table已存在，则修改table样式，并清空参考线及其控制器
+	5. 如table已存在，则修改table样式，并清空其控制器
 		* modifyTable
-    6. 全局修改p字体大小/行高/颜色
+    6. 全局定义p样式：字体大小/行高/颜色
         * click事件
 
 * 阶段二
@@ -250,22 +250,21 @@ version7是响应式版本，删除version6中的hr，margin，h3，取消鼠标
 * 阶段三
 	1. “addp”点击，清除p控件内事件捆绑，添加帮助模块
 		* pHelper()
-	2. 点击获取数据内容，计算当前文字属于第几个div和div内第几个p,
-		* 若点击对象相同，
-			* 不作处理
-		* 若对象不同，清除旧帮助模块，产生新帮助模块
-            * removePHelper(ptableNum, pNum)
-            * addPControllerFace(ptableNumber,pNumber)
-            * setPControllerFace(ptableNumber,pNumber)
-            * //PFontSize(ptableNumber,pNumber)
-            * PFontSizeSpinner(ptableNumber,pNumber)
-            * //PLineHeight(ptableNumber,pNumber)
-            * PLineHeightSpinner(ptableNumber,pNumber)
-            * PColor(ptableNumber,pNumber)
-            * PColorMore(ptableNumber,pNumber)
-            * PAlign(ptableNumber,pNumber)
-            * PResetPosition(ptableNumber,pNumber)
-            * PTextarea(ptableNumber,pNumber)
+	2. 点击获取数据内容，计算当前文字属于第几个div和div内第几个p，清除旧帮助模块，产生新帮助模块
+		* removePHelper(ptableNum, pNum)
+		* addPControllerFace(ptableNumber,pNumber)
+		* setPControllerFace(ptableNumber,pNumber)
+		* PFontSize(ptableNumber,pNumber)
+		* PFontSizeSpinner(ptableNumber,pNumber)
+		* PLineHeight(ptableNumber,pNumber)
+		* PLineHeightSpinner(ptableNumber,pNumber)
+		* PColor(ptableNumber,pNumber)
+		* PColorMore(ptableNumber,pNumber)
+		* PAlign(ptableNumber,pNumber)
+		* PResetPosition(ptableNumber,pNumber)
+		* PTextarea(ptableNumber,pNumber)
+		* pDirection(ptableNumber,pNumber)
+		* pDirectionFocus(ptableNumber,pNumber)
 
 * 阶段四
 	1. “end”点击，清除文字拖动事件
