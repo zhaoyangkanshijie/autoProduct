@@ -27,6 +27,8 @@ version6在version5的基础上，增加思源黑体多种ttf的选择。包括B
 
 version7是响应式版本，删除version6中的hr，margin，h3，取消鼠标移动，改为awsd，fthg，jilk，上下左右移动方向
 
+近期发现已在使用的各版本思源黑体行高有问题，具体表现为在IE浏览器下字体位置偏高，官方已有相关issue https://github.com/adobe-fonts/source-han-sans/issues/88，已发布新版本2.002修复该问题
+
 ## 界面
 
 1. 随意修改文字大小行高，且随意拖动，修改样式和布局方便
